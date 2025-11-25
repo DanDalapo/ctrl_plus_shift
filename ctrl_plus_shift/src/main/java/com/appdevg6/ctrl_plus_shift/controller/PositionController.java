@@ -1,7 +1,7 @@
-package com.appdev.ctrlshift.controller;
+package com.appdevg6.ctrl_plus_shift.controller;
 
-import com.appdev.ctrlshift.entity.Position;
-import com.appdev.ctrlshift.service.PositionService;
+import com.appdevg6.ctrl_plus_shift.entity.Position;
+import com.appdevg6.ctrl_plus_shift.service.PositionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

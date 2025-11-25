@@ -1,9 +1,8 @@
-package com.appdev.ctrlshift.service;
+package com.appdevg6.ctrl_plus_shift.service;
 
-import com.appdev.ctrlshift.entity.Position;
-import com.appdev.ctrlshift.repository.PositionRepository;
+import com.appdevg6.ctrl_plus_shift.entity.Position;
+import com.appdevg6.ctrl_plus_shift.repository.PositionRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 

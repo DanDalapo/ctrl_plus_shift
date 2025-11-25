@@ -1,4 +1,4 @@
-package com.appdev.ctrlshift.entity;
+package com.appdevg6.ctrl_plus_shift.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
