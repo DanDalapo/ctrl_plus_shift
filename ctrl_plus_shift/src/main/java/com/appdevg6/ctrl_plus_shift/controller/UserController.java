@@ -3,7 +3,6 @@ package com.appdevg6.ctrl_plus_shift.controller;
 import com.appdevg6.ctrl_plus_shift.entity.UserEntity;
 import com.appdevg6.ctrl_plus_shift.service.UserService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

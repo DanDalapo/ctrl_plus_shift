@@ -1,10 +1,10 @@
 package com.appdevg6.ctrl_plus_shift.repository;
 
-import com.appdevg6.ctrl_plus_shift.entity.PositionEntity;
+import com.appdevg6.ctrl_plus_shift.entity.VoteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PositionRepository extends JpaRepository<PositionEntity, Integer> {
+public interface VoteRepository extends JpaRepository<VoteEntity, Integer> {
     
 }
