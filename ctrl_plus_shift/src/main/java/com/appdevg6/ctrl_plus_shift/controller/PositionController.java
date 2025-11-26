@@ -1,16 +1,15 @@
 package com.appdevg6.ctrl_plus_shift.controller;
 
-import com.appdevg6.ctrl_plus_shift.entity.Position;
+import com.appdevg6.ctrl_plus_shift.entity.PositionEntity;
 import com.appdevg6.ctrl_plus_shift.service.PositionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/v1/positions")
+@RequestMapping("/positions")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PositionController {
 
     private final PositionService positionService;
@@ -20,26 +19,26 @@ public class PositionController {
     }
 
     @PostMapping
-    public ResponseEntity<Position> createPosition(@RequestBody Position position) {
-        Position newPosition = positionService.createPosition(position);
+    public ResponseEntity<PositionEntity> createPosition(@RequestBody PositionEntity position) {
+        PositionEntity newPosition = positionService.createPosition(position);
         return new ResponseEntity<>(newPosition, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Position>> getAllPositions() {
-        List<Position> positions = positionService.getAllPositions();
+    public ResponseEntity<List<PositionEntity>> getAllPositions() {
+        List<PositionEntity> positions = positionService.getAllPositions();
         return ResponseEntity.ok(positions);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Position> getPositionById(@PathVariable Long id) {
-        Position position = positionService.getPositionById(id);
+    public ResponseEntity<PositionEntity> getPositionById(@PathVariable Long id) {
+        PositionEntity position = positionService.getPositionById(id);
         return ResponseEntity.ok(position);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Position> updatePosition(@PathVariable Long id, @RequestBody Position positionDetails) {
-        Position updatedPosition = positionService.updatePosition(id, positionDetails);
+    public ResponseEntity<PositionEntity> updatePosition(@PathVariable Long id, @RequestBody PositionEntity positionDetails) {
+        PositionEntity updatedPosition = positionService.updatePosition(id, positionDetails);
         return ResponseEntity.ok(updatedPosition);
     }
 

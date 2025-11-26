@@ -1,48 +1,39 @@
 package com.appdevg6.ctrl_plus_shift.service;
 
-import com.appdevg6.ctrl_plus_shift.entity.Position;
+import com.appdevg6.ctrl_plus_shift.entity.PositionEntity;
 import com.appdevg6.ctrl_plus_shift.repository.PositionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PositionService {
-    private final PositionRepository positionRepository;
 
-    public PositionService(PositionRepository positionRepository) {
-        this.positionRepository = positionRepository;
-    }
+    @Autowired
+    private PositionRepository positionRepository;
 
-    
-    public List<Position> getAllPositions() {
-        return positionRepository.findAll();
-    }
-
-    public Position getPositionById(Long id) {
-        return positionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Position not found with id: " + id));
-    }
-
-    public Position createPosition(Position position) {
-        Optional<Position> existingPosition = positionRepository.findByPositionName(position.getPositionName());
-        if (existingPosition.isPresent()) {
-            throw new RuntimeException("Position with name '" + position.getPositionName() + "' already exists.");
-        }
+    public PositionEntity createPosition(PositionEntity position) {
         return positionRepository.save(position);
     }
 
-    public Position updatePosition(Long id, Position positionDetails) {
-        Position existingPosition = getPositionById(id);
-
-        existingPosition.setPositionName(positionDetails.getPositionName());
-        existingPosition.setDescription(positionDetails.getDescription());
-
-        return positionRepository.save(existingPosition);
+    public List<PositionEntity> getAllPositions() {
+        return positionRepository.findAll();
     }
 
-    public void deletePosition(Long id) {
-        Position position = getPositionById(id);
-        positionRepository.delete(position);
+    public PositionEntity getPositionById(Integer id) {
+        return positionRepository.findById(id).orElse(null);
+    }
+
+    public PositionEntity updatePosition(Integer id, PositionEntity positionDetails) {
+        return positionRepository.findById(id).map(position -> {
+            position.setPositionName(positionDetails.getPositionName());
+            position.setDescription(positionDetails.getDescription());
+            return positionRepository.save(position);
+        }).orElse(null);
+    }
+
+    public void deletePosition(Integer id) {
+        positionRepository.deleteById(id);
     }
 }

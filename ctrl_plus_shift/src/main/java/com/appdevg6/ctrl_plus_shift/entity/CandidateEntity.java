@@ -15,39 +15,52 @@ public class CandidateEntity {
     private UserEntity user;
 
     private String course;
-    private Integer platformID;  
-    private Integer positionID;
 
-    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "platformID", referencedColumnName = "platform_id")
+    private PlatformEntity platform;
+
+    @ManyToOne
+    @JoinColumn(name = "positionID", referencedColumnName = "position_id")
+    private PositionEntity position;
+
     public Integer getCandidateID() {
         return candidateID;
     }
+
     public void setCandidateID(Integer candidateID) {
         this.candidateID = candidateID;
     }
+
     public UserEntity getUser() {
         return user;
     }
+
     public void setUser(UserEntity user) {
         this.user = user;
     }
+
     public String getCourse() {
         return course;
     }
+
     public void setCourse(String course) {
         this.course = course;
     }
-    public Integer getPlatformID() {
-        return platformID;
+
+    public PlatformEntity getPlatform() {
+        return platform;
     }
-    public void setPlatformID(Integer platformID) {
-        this.platformID = platformID;
+
+    public void setPlatform(PlatformEntity platform) {
+        this.platform = platform;
     }
-    public Integer getPositionID() {
-        return positionID;
+
+    public PositionEntity getPosition() {
+        return position;
     }
-    public void setPositionID(Integer positionID) {
-        this.positionID = positionID;
+
+    public void setPosition(PositionEntity position) {
+        this.position = position;
     }
 }
-

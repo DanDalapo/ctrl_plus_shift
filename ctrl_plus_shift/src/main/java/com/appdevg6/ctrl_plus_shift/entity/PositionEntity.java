@@ -9,7 +9,7 @@ import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "positions")
-public class Position {
+public class PositionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,10 @@ public class Position {
     private String description;
 
 
-    public Position() {
+    public PositionEntity() {
     }
 
-    public Position(String positionName, String description) {
+    public PositionEntity(String positionName, String description) {
         this.positionName = positionName;
         this.description = description;
     }
