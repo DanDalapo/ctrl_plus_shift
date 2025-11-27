@@ -1,10 +1,8 @@
 package com.appdevg6.ctrl_plus_shift.service;
 
 import org.springframework.stereotype.Service;
-
 import com.appdevg6.ctrl_plus_shift.entity.UserEntity;
 import com.appdevg6.ctrl_plus_shift.repository.UserRepository;
-
 import java.util.List;
 
 @Service
@@ -32,14 +30,19 @@ public class UserService {
         UserEntity userUpdate = repo.findById(id).orElse(null);
         if (userUpdate == null) return null;
 
-        userUpdate.setFirstName(updated.getFirstName());
-        userUpdate.setLastName(updated.getLastName());
-        userUpdate.setDateOfBirth(updated.getDateOfBirth());
-        userUpdate.setEmail(updated.getEmail());
-        userUpdate.setPassword(updated.getPassword());
-        userUpdate.setUserType(updated.getUserType());
-        userUpdate.setPhoneNumber(updated.getPhoneNumber());
-        userUpdate.setBio(updated.getBio());
+        // Only update fields if they are NOT null
+        if (updated.getFirstName() != null) userUpdate.setFirstName(updated.getFirstName());
+        if (updated.getLastName() != null) userUpdate.setLastName(updated.getLastName());
+        if (updated.getDateOfBirth() != null) userUpdate.setDateOfBirth(updated.getDateOfBirth());
+        if (updated.getEmail() != null) userUpdate.setEmail(updated.getEmail());
+        if (updated.getUserType() != null) userUpdate.setUserType(updated.getUserType());
+        if (updated.getPhoneNumber() != null) userUpdate.setPhoneNumber(updated.getPhoneNumber());
+        if (updated.getBio() != null) userUpdate.setBio(updated.getBio());
+
+        // CRITICAL PROTECTION: Do not overwrite password if it's null/empty
+        if (updated.getPassword() != null && !updated.getPassword().isEmpty()) {
+            userUpdate.setPassword(updated.getPassword());
+        }
 
         return repo.save(userUpdate);
     }
@@ -49,16 +52,12 @@ public class UserService {
     }
 
     public UserEntity loginUser(String email, String password) {
-        // 1. Check if user exists in DB
         UserEntity user = repo.findByEmail(email);
-
-        // 2. If user exists, check if password matches
-        if (user != null) {
+        if (user != null && user.getPassword() != null) { 
             if (user.getPassword().equals(password)) {
-                return user; // Login Success
+                return user; 
             }
         }
-        
         return null; 
     }
 }
