@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios'; // <--- IMPT: Ensure you have run 'npm install axios'
 import './css/login.css';
 
 export default class LoginPage extends React.Component {
@@ -28,12 +29,46 @@ export default class LoginPage extends React.Component {
     this.setState({ showPassword: !this.state.showPassword });
   }
 
-  handleSubmit = () => {
-    console.log('Login submitted:', {
-      email: this.state.email,
-      password: this.state.password,
-      keepLoggedIn: this.state.keepLoggedIn
-    });
+  handleSubmit = async () => {
+    const { email, password } = this.state;
+
+    if (!email || !password) {
+      alert("Please fill in both email and password.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:8080/users/login", {
+        email: email,
+        password: password
+      });
+
+      // 3. Handle Success (Status Code 200)
+      console.log('Login Success:', response.data);
+      alert(`Login Successful! Welcome, ${response.data.firstName || 'User'}`);
+      
+      // OPTIONAL: Save user data to session/local storage
+      if(this.state.keepLoggedIn) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+      } else {
+        sessionStorage.setItem('user', JSON.stringify(response.data));
+      }
+
+      // 4. Redirect (Uncomment and change path as needed)
+      window.location.href = "/Home";
+
+    } catch (error) {
+      // 5. Handle Errors
+      console.error('Login Error:', error);
+
+      if (error.response && error.response.status === 401) {
+        alert("Login Failed: Incorrect email or password.");
+      } else if (error.code === "ERR_NETWORK") {
+        alert("Cannot connect to server. Is your Spring Boot backend running?");
+      } else {
+        alert("An unexpected error occurred.");
+      }
+    }
   }
 
   render() {
@@ -50,7 +85,7 @@ export default class LoginPage extends React.Component {
         <div className="login-panel">
           <div className="login-form-container">
             <h2 className="login-heading">Login</h2>
-            <p className="login-subheading">please enter you login details</p>
+            <p className="login-subheading">please enter your login details</p>
 
             <div>
               {/* Email Input */}
@@ -76,6 +111,7 @@ export default class LoginPage extends React.Component {
                 <button
                   onClick={this.togglePasswordVisibility}
                   className="password-toggle"
+                  type="button" // Add type button to prevent form submission
                 >
                   {this.state.showPassword ? '👁️' : '👁️‍🗨️'}
                 </button>

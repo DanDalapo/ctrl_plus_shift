@@ -47,4 +47,18 @@ public class UserService {
     public void delete(Integer id) {
         repo.deleteById(id);
     }
+
+    public UserEntity loginUser(String email, String password) {
+        // 1. Check if user exists in DB
+        UserEntity user = repo.findByEmail(email);
+
+        // 2. If user exists, check if password matches
+        if (user != null) {
+            if (user.getPassword().equals(password)) {
+                return user; // Login Success
+            }
+        }
+        
+        return null; 
+    }
 }

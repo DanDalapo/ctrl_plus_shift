@@ -31,19 +31,19 @@ public class PositionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PositionEntity> getPositionById(@PathVariable Long id) {
+    public ResponseEntity<PositionEntity> getPositionById(@PathVariable int id) {
         PositionEntity position = positionService.getPositionById(id);
         return ResponseEntity.ok(position);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PositionEntity> updatePosition(@PathVariable Long id, @RequestBody PositionEntity positionDetails) {
+    public ResponseEntity<PositionEntity> updatePosition(@PathVariable int id, @RequestBody PositionEntity positionDetails) {
         PositionEntity updatedPosition = positionService.updatePosition(id, positionDetails);
         return ResponseEntity.ok(updatedPosition);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePosition(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePosition(@PathVariable int id) {
         positionService.deletePosition(id);
         return ResponseEntity.noContent().build();
     }
