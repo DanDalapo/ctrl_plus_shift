@@ -1,0 +1,205 @@
+/* Base & Container */
+.landing-container {
+  min-height: 100vh;
+  background-color: #7f1d1d; 
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+/* Headers */
+.landing-header h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+}
+
+.landing-header p {
+  font-size: 1.25rem;
+  margin: 0 0 4rem 0;
+  max-width: 800px;
+  opacity: 0.9;
+}
+
+.get-started-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.get-started-section p {
+  font-size: 1.125rem;
+  margin: 0 0 3rem 0;
+  opacity: 0.9;
+}
+
+/* Cards Container */
+.landing-cards-container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 1200px;
+  width: 100%;
+  position: relative;
+}
+
+/* Card Styles */
+.landing-card {
+  background-color: white;
+  color: #111827;
+  border-radius: 2rem;
+  padding: 3rem 2.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  margin: 0 1.5rem;
+}
+
+/* --- UPDATED ICON STYLES START --- */
+.card-icon-wrapper {
+  padding: 1.5rem;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;  /* Fixed width */
+  height: 90px; /* Fixed height for perfect circle */
+  position: relative;
+}
+
+.candidate-icon-wrapper {
+  /* Shiny Gold Gradient Background */
+  background: linear-gradient(135deg, #fde047 0%, #ca8a04 100%);
+  color: white; /* Icon is white */
+  box-shadow: 0 10px 15px -3px rgba(202, 138, 4, 0.3);
+}
+
+.voter-icon-wrapper {
+  /* Deep Red Gradient Background */
+  background: linear-gradient(135deg, #ef4444 0%, #7f1d1d 100%);
+  color: white; /* Icon is white */
+  box-shadow: 0 10px 15px -3px rgba(127, 29, 29, 0.3);
+}
+/* --- UPDATED ICON STYLES END --- */
+
+/* Card Typography */
+.landing-card h2 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+}
+
+.card-subtitle {
+  font-size: 1.125rem;
+  color: #4b5563; 
+  margin: 0 0 2.5rem 0;
+}
+
+/* Check Lists */
+.benefit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 3rem 0;
+  text-align: left;
+  width: 100%;
+  max-width: 400px;
+}
+
+.benefit-list li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.check-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 0.75rem;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.1rem; 
+}
+
+.candidate-check { background-color: #d4af37; }
+.voter-check { background-color: #991b1b; }
+
+/* Buttons */
+.card-button {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 9999px;
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto; 
+  display: inline-block;
+}
+
+.candidate-button {
+  background: linear-gradient(135deg, #e6c761 0%, #d4af37 100%);
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+}
+
+.voter-button {
+  background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+  box-shadow: 0 4px 10px rgba(153, 27, 27, 0.3);
+}
+
+.card-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* Vertical Divider */
+.card-divider {
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.3);
+  align-self: stretch;
+  margin: 2rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .landing-container {
+    padding: 3rem 1.5rem;
+  }
+  
+  .landing-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .landing-cards-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-divider {
+    display: none; 
+  }
+
+  .landing-card {
+    width: 100%;
+    max-width: 500px;
+    margin: 1.5rem 0;
+    padding: 2.5rem 1.5rem;
+  }
+}

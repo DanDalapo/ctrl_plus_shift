@@ -2,6 +2,8 @@ package com.appdevg6.ctrl_plus_shift.controller;
 
 import com.appdevg6.ctrl_plus_shift.entity.UserEntity;
 import com.appdevg6.ctrl_plus_shift.service.UserService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,6 +20,17 @@ public class UserController {
 
     @PostMapping
     public UserEntity create(@RequestBody UserEntity u) { return service.create(u); }
+    @PostMapping("/login")
+    
+    public ResponseEntity<?> login(@RequestBody UserEntity loginDetails) {
+        
+    UserEntity user = service.loginUser(loginDetails.getEmail(), loginDetails.getPassword());
+    if (user != null) {
+        return ResponseEntity.ok(user); // Return the full user object on success
+    } else {
+        return ResponseEntity.status(401).body("Invalid Email or Password");
+    }
+}
 
     @GetMapping
     public List<UserEntity> getAll() { return service.getAll(); }
