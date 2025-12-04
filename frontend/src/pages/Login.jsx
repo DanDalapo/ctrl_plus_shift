@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios'; // <--- IMPT: Ensure you have run 'npm install axios'
+import axios from 'axios'; 
 import './css/login.css';
 
 export default class LoginPage extends React.Component {
@@ -43,22 +43,21 @@ export default class LoginPage extends React.Component {
         password: password
       });
 
-      // 3. Handle Success (Status Code 200)
+      //(Status Code 200)
       console.log('Login Success:', response.data);
       alert(`Login Successful! Welcome, ${response.data.firstName || 'User'}`);
       
-      // OPTIONAL: Save user data to session/local storage
+      // Save user data to session/local storage
       if(this.state.keepLoggedIn) {
         localStorage.setItem('user', JSON.stringify(response.data));
       } else {
         sessionStorage.setItem('user', JSON.stringify(response.data));
       }
 
-      // 4. Redirect (Uncomment and change path as needed)
+      // 4. Redirect 
       window.location.href = "/Home";
 
     } catch (error) {
-      // 5. Handle Errors
       console.error('Login Error:', error);
 
       if (error.response && error.response.status === 401) {
@@ -111,7 +110,7 @@ export default class LoginPage extends React.Component {
                 <button
                   onClick={this.togglePasswordVisibility}
                   className="password-toggle"
-                  type="button" // Add type button to prevent form submission
+                  type="button" 
                 >
                   {this.state.showPassword ? '👁️' : '👁️‍🗨️'}
                 </button>

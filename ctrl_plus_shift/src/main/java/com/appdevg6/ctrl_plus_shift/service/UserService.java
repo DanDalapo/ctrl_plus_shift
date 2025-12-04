@@ -67,7 +67,7 @@ public class UserService {
         if (updated.getDateOfBirth() != null) userUpdate.setDateOfBirth(updated.getDateOfBirth());
         if (updated.getEmail() != null) userUpdate.setEmail(updated.getEmail());
         if (updated.getUserType() != null) userUpdate.setUserType(updated.getUserType());
-        if (updated.getPhoneNumber() != null) userUpdate.setPhoneNumber(updated.getPhoneNumber());
+        if (updated.getStrStudentID() != null) userUpdate.setStrStudentID(updated.getStrStudentID());
         if (updated.getBio() != null) userUpdate.setBio(updated.getBio());
 
         if (updated.getPassword() != null && !updated.getPassword().isEmpty()) {
