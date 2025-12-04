@@ -22,7 +22,7 @@ public class UserEntity {
     private String email;
     private String password;
     private String userType;
-    private String phoneNumber;
+    private String strStudentID;
     private String bio;
 
     public Integer getUserID() {
@@ -67,11 +67,11 @@ public class UserEntity {
     public void setUserType(String userType) {
         this.userType = userType;
     }
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getStrStudentID() {
+        return strStudentID;
     }
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setStrStudentID(String strStudentID) {
+        this.strStudentID = strStudentID;
     }
     public String getBio() {
         return bio;

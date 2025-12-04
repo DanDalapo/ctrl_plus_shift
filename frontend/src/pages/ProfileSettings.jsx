@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios'; // <--- IMPORT AXIOS
+import { Link } from 'react-router-dom'; // <--- Ensure this is imported
+import axios from 'axios'; 
 import './css/profile_settings.css';
 import './css/home.css';
 
@@ -8,12 +8,12 @@ export default class ProfileSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userID: null, // <--- Add userID to state
+      userID: null, 
       firstName: '',
       lastName: '',
       fullName: '',
       email: '',
-      phone: '',
+      stuID: '',
       dob: '',
       bio: '',
       bioCharCount: 0,
@@ -28,12 +28,12 @@ export default class ProfileSettings extends React.Component {
       try {
         const userObj = JSON.parse(storedUser);
         this.setState({
-          userID: userObj.userID, // <--- Capture User ID
+          userID: userObj.userID, 
           firstName: userObj.firstName || '',
           lastName: userObj.lastName || '',
           fullName: `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim(), 
           email: userObj.email || '',
-          phone: userObj.phoneNumber || '', 
+          stuID: userObj.strStudentID || '', 
           dob: userObj.dateOfBirth || '',
           bio: userObj.bio || '',
           bioCharCount: (userObj.bio || '').length
@@ -53,13 +53,9 @@ export default class ProfileSettings extends React.Component {
     }
   }
 
-  handleTabClick = (tab) => {
-    this.setState({ activeTab: tab });
-  }
 
-  // === ADD THE SAVE FUNCTION ===
   handleSave = async () => {
-    const { userID, phone, bio } = this.state; // We only need to send what we changed
+    const { userID, stuID, bio } = this.state; 
 
     if (!userID) {
       alert("Error: User ID missing. Please log in again.");
@@ -67,9 +63,8 @@ export default class ProfileSettings extends React.Component {
     }
 
     try {
-      // Send ONLY the fields we want to update
       const updatePayload = {
-        phoneNumber: phone,
+        strStudentID: stuID,
         bio: bio
       };
 
@@ -78,7 +73,6 @@ export default class ProfileSettings extends React.Component {
       if (response.status === 200) {
         alert("Profile Updated Successfully!");
         
-        // Update local storage with the new data from backend
         const updatedUser = response.data;
         const storageKey = localStorage.getItem('user') ? 'user' : null;
         if(storageKey) {
@@ -100,7 +94,6 @@ export default class ProfileSettings extends React.Component {
         <aside className="sidebar">
           <div className="user-profile">
              <div className="avatar-circle">
-               {/* SVG Icon */}
               <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -130,12 +123,26 @@ export default class ProfileSettings extends React.Component {
           <div className="settings-container">
             <div className="settings-header"><h1>Settings</h1></div>
 
+            {/* === THIS IS THE FIX: LINKS instead of Buttons === */}
             <div className="settings-tabs">
-              <button className={`tab-button ${this.state.activeTab === 'profile' ? 'active' : ''}`} onClick={() => this.handleTabClick('profile')}>Profile</button>
-              <button className={`tab-button ${this.state.activeTab === 'account' ? 'active' : ''}`} onClick={() => this.handleTabClick('account')}>Account</button>
-              <button className={`tab-button ${this.state.activeTab === 'notifications' ? 'active' : ''}`} onClick={() => this.handleTabClick('notifications')}>Notifications</button>
-              <button className={`tab-button ${this.state.activeTab === 'security' ? 'active' : ''}`} onClick={() => this.handleTabClick('security')}>Security</button>
+              {/* Profile is active because we are ON the Profile page */}
+              <Link to="/settings" className="tab-button active">
+                Profile
+              </Link>
+              
+              <Link to="/settings/account" className="tab-button">
+                Account
+              </Link>
+              
+              <Link to="/settings/notifications" className="tab-button">
+                Notifications
+              </Link>
+              
+              <Link to="/settings/security" className="tab-button">
+                Security
+              </Link>
             </div>
+            {}
 
             <div className="settings-content-card">
               <div className="profile-section">
@@ -143,11 +150,10 @@ export default class ProfileSettings extends React.Component {
                 <p className="section-description">Update your profile picture and personal information</p>
 
                 <div className="profile-picture-section">
-                   {/* ... Keep picture section as is ... */}
                   <h3>Profile Picture</h3>
                   <div className="picture-upload">
                     <div className="picture-preview">
-                       <svg className="default-avatar" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <svg className="default-avatar" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </div>
                     <div className="picture-actions">
                       <button className="change-picture-btn"><span className="camera-icon">📷</span> Change Picture</button>
@@ -169,10 +175,9 @@ export default class ProfileSettings extends React.Component {
                     <input type="email" name="email" value={this.state.email} className="form-input" disabled />
                   </div>
 
-                  {/* EDITABLE */}
                   <div className="form-group">
-                    <label>Phone Number</label>
-                    <input type="text" name="phone" value={this.state.phone} onChange={this.handleInputChange} className="form-input" />
+                    <label>Student Number</label>
+                    <input type="text" name="stuID" value={this.state.stuID} className="form-input" disabled />
                   </div>
 
                   <div className="form-group">
@@ -180,7 +185,6 @@ export default class ProfileSettings extends React.Component {
                     <input type="text" name="dob" value={this.state.dob} className="form-input" disabled />
                   </div>
 
-                  {/* EDITABLE */}
                   <div className="form-group bio-group">
                     <label>Bio</label>
                     <textarea name="bio" placeholder="tell us about yourself..." value={this.state.bio} onChange={this.handleInputChange} maxLength="500" className="form-input"></textarea>
@@ -191,7 +195,6 @@ export default class ProfileSettings extends React.Component {
                 <hr className="divider" />
 
                 <div className="form-actions">
-                  {/* CONNECT THE BUTTON */}
                   <button className="save-btn" onClick={this.handleSave}>
                     Save Changes
                   </button>

@@ -4,7 +4,6 @@ import './css/landing.css';
 
 export default class LandingPage extends React.Component {
   
-  // 1. Helper function to save the user type selection
   handleSelection = (type) => {
     // We save this to localStorage so Register.jsx can read it even after a page reload
     localStorage.setItem('selectedUserType', type);

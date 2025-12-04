@@ -3,26 +3,28 @@ import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import HomePage from './pages/Home';
 import LandingPage from './pages/Landing';
-import ProfileSettings from './pages/ProfileSettings'; 
+import ProfileSettings from './pages/ProfileSettings';
+import AccountSettings from './pages/AccountSettings';
+import NotificationSettings from './pages/NotificationSettings';
+import SecuritySettings from './pages/SecuritySettings'; 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Landing Page is the default entry point */}
         <Route path="/" element={<LandingPage />} />
         
-        {/* Main Dashboard */}
         <Route path="/home" element={<HomePage />} />
         
-        {/* Auth Pages */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         
-        {/* Settings Page */}
+        {/* Settings Routes */}
         <Route path="/settings" element={<ProfileSettings />} />
+        <Route path="/settings/account" element={<AccountSettings />} />
+        <Route path="/settings/notifications" element={<NotificationSettings />} />
+        <Route path="/settings/security" element={<SecuritySettings />} />
 
-        {/* Placeholders for pages we haven't built yet */}
         <Route path="/candidates" element={<div>Candidates Page (Coming Soon)</div>} />
         <Route path="/vote" element={<div>Vote Page (Coming Soon)</div>} />
         <Route path="/results" element={<div>Results Page (Coming Soon)</div>} />

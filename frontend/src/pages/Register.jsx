@@ -10,10 +10,10 @@ export default class RegisterPage extends React.Component {
       lastName: '',
       dob: '',
       email: '',
-      phoneNumber: '',
+      strStudentID: '',
       password: '',
       confirmPassword: '',
-      userType: 'Voter', // Default fallback
+      userType: 'Voter', 
       agreeTerms: false,
       showPassword: false,
       showConfirmPassword: false,
@@ -22,7 +22,6 @@ export default class RegisterPage extends React.Component {
     };
   }
 
-  // 1. Load the User Type from LocalStorage when page loads
   componentDidMount() {
     const savedType = localStorage.getItem('selectedUserType');
     if (savedType) {
@@ -53,12 +52,10 @@ export default class RegisterPage extends React.Component {
     this.setState({ showError: false });
   }
 
-  // 2. Updated Handle Submit with Fetch Logic
   handleSubmit = async () => {
-    const { firstName, lastName, dob, email, phoneNumber, password, confirmPassword, agreeTerms, userType } = this.state;
+    const { firstName, lastName, dob, email, strStudentID, password, confirmPassword, agreeTerms, userType } = this.state;
     
-    // Validation
-    if (!firstName || !lastName || !dob || !email || !phoneNumber || !password || !confirmPassword) {
+    if (!firstName || !lastName || !dob || !email || !strStudentID || !password || !confirmPassword) {
       this.triggerError('Please fill in all fields.');
       return;
     }
@@ -73,22 +70,20 @@ export default class RegisterPage extends React.Component {
       return;
     }
 
-    // Prepare JSON object matching your Java UserEntity
     const userData = {
       firstName: firstName,
       lastName: lastName,
-      dateOfBirth: dob,  // Input type="date" sends YYYY-MM-DD automatically
+      dateOfBirth: dob,  
       email: email,
       password: password,
       userType: userType,
-      phoneNumber: phoneNumber,
-      bio: "" // Sending empty string as default
+      strStudentID: strStudentID,
+      bio: "" 
     };
 
     console.log("Sending data:", userData);
 
     try {
-      // Make the POST request to Spring Boot
       const response = await fetch('http://localhost:8080/users', {
         method: 'POST',
         headers: {
@@ -101,10 +96,7 @@ export default class RegisterPage extends React.Component {
         // Success!
         console.log('User registered successfully');
         alert('Registration Successful!');
-        // Optional: Redirect to login
-        // window.location.href = '/login';
       } else {
-        // Handle backend errors (e.g. 500 or 400)
         this.triggerError('Registration failed. Server returned: ' + response.status);
       }
     } catch (error) {
@@ -116,7 +108,6 @@ export default class RegisterPage extends React.Component {
   render() {
     return (
       <div className="register-container">
-        {/* CUSTOM POP-UP MODAL */}
         {this.state.showError && (
           <div className="modal-overlay">
             <div className="modal-content">
@@ -194,12 +185,12 @@ export default class RegisterPage extends React.Component {
             </div>
 
             <div className="input-wrapper">
-              <label className="input-label">Phone Number</label>
+              <label className="input-label">Student Number</label>
               <input
                 type="tel"
-                name="phoneNumber"
-                placeholder="Enter your phone number"
-                value={this.state.phoneNumber}
+                name="strStudentID"
+                placeholder="Enter your student number"
+                value={this.state.strStudentID}
                 onChange={this.handleInputChange}
                 className="register-input"
               />

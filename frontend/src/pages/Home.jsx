@@ -6,7 +6,6 @@ const NEWS_IMAGE_URL = "https://images.unsplash.com/photo-1541339907198-e08756de
 
 export default class HomePage extends React.Component {
   
-  // 1. Initialize State
   constructor(props) {
     super(props);
     this.state = {
@@ -18,8 +17,6 @@ export default class HomePage extends React.Component {
 
   // 2. Load Data when page opens
   componentDidMount() {
-    // Try to get user from Local Storage (Keep me logged in)
-    // OR Session Storage (One time login)
     const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
 
     if (storedUser) {
@@ -88,7 +85,6 @@ export default class HomePage extends React.Component {
               to="/login" 
               className="nav-item sign-out"
               onClick={() => {
-                // Optional: Clear data when signing out
                 localStorage.removeItem('user');
                 sessionStorage.removeItem('user');
               }}
