@@ -1,168 +1,139 @@
-import React from 'react';
-import axios from 'axios'; 
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './css/login.css';
 
-export default class LoginPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: '',
-      password: '',
-      keepLoggedIn: true,
-      showPassword: false
-    };
+export default function LoginPage() {
+  const navigate = useNavigate();
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [keepLoggedIn, setKeepLoggedIn] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   }
 
-  handleEmailChange = (e) => {
-    this.setState({ email: e.target.value });
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
   }
 
-  handlePasswordChange = (e) => {
-    this.setState({ password: e.target.value });
+  const handleCheckboxChange = (e) => {
+    setKeepLoggedIn(e.target.checked);
   }
 
-  handleCheckboxChange = (e) => {
-    this.setState({ keepLoggedIn: e.target.checked });
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   }
 
-  togglePasswordVisibility = () => {
-    this.setState({ showPassword: !this.state.showPassword });
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    console.log("Forgot password clicked");
   }
 
-  handleSubmit = async () => {
-    const { email, password } = this.state;
-
-    if (!email || !password) {
-      alert("Please fill in both email and password.");
-      return;
-    }
-
-    try {
-      const response = await axios.post("http://localhost:8080/users/login", {
-        email: email,
-        password: password
-      });
-
-      //(Status Code 200)
-      console.log('Login Success:', response.data);
-      alert(`Login Successful! Welcome, ${response.data.firstName || 'User'}`);
-      
-      // Save user data to session/local storage
-      if(this.state.keepLoggedIn) {
-        localStorage.setItem('user', JSON.stringify(response.data));
-      } else {
-        sessionStorage.setItem('user', JSON.stringify(response.data));
-      }
-
-      // 4. Redirect 
-      window.location.href = "/Home";
-
-    } catch (error) {
-      console.error('Login Error:', error);
-
-      if (error.response && error.response.status === 401) {
-        alert("Login Failed: Incorrect email or password.");
-      } else if (error.code === "ERR_NETWORK") {
-        alert("Cannot connect to server. Is your Spring Boot backend running?");
-      } else {
-        alert("An unexpected error occurred.");
-      }
-    }
+  const handleSubmit = () => {
+    console.log('Login submitted:', {
+      email,
+      password,
+      keepLoggedIn
+    });
+    
+    navigate('/home');
   }
 
-  render() {
-    return (
-      <div className="login-container">
-        {/* Left Panel - Welcome Section */}
-        <div className="welcome-panel">
-          <h1 className="welcome-title">
-            Welcome<br />Back!
-          </h1>
-        </div>
+  return (
+    <div className="login-container">
+      <div className="welcome-panel">
+        <h1 className="welcome-title">
+          Welcome<br />Back!
+        </h1>
+      </div>
 
-        {/* Right Panel - Login Form */}
-        <div className="login-panel">
-          <div className="login-form-container">
-            <h2 className="login-heading">Login</h2>
-            <p className="login-subheading">please enter your login details</p>
+      <div className="login-panel">
+        <div className="login-form-container">
+          <h2 className="login-heading">Login</h2>
+          <p className="login-subheading">please enter you login details</p>
 
-            <div>
-              {/* Email Input */}
-              <div className="input-group">
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  value={this.state.email}
-                  onChange={this.handleEmailChange}
-                  className="input-field"
-                />
-              </div>
+          <form autoComplete="off" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+            <div className="input-group">
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={handleEmailChange}
+                className="input-field"
+                autoComplete="off"
+                name="email_login_field" // Unique name to prevent auto-fill collision
+              />
+            </div>
 
-              {/* Password Input */}
-              <div className="input-group">
-                <input
-                  type={this.state.showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  value={this.state.password}
-                  onChange={this.handlePasswordChange}
-                  className="input-field"
-                />
-                <button
-                  onClick={this.togglePasswordVisibility}
-                  className="password-toggle"
-                  type="button" 
-                >
-                  {this.state.showPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-
-              {/* Forgot Password Link */}
-              <div className="forgot-password-container">
-                <a href="#" className="forgot-password-link">
-                  Forgot password?
-                </a>
-              </div>
-
-              {/* Keep me logged in Checkbox */}
-              <div className="checkbox-container">
-                <input
-                  type="checkbox"
-                  id="keepLoggedIn"
-                  checked={this.state.keepLoggedIn}
-                  onChange={this.handleCheckboxChange}
-                  className="checkbox-input"
-                />
-                <label htmlFor="keepLoggedIn" className="checkbox-label">
-                  Keep me logged in
-                </label>
-              </div>
-
-              {/* Login Button */}
+            <div className="input-group">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
+                className="input-field"
+                autoComplete="new-password" // Often prevents the "Save Password" prompt
+                name="password_login_field"
+              />
               <button
-                onClick={this.handleSubmit}
-                className="login-button"
+                onClick={togglePasswordVisibility}
+                className="password-toggle"
+                type="button" 
+                title={showPassword ? "Hide password" : "Show password"}
               >
-                Login
+                {showPassword ? (
+                  /* Visible -> Open Eye */
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                ) : (
+                  /* Hidden -> Slashed Eye */
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                )}
               </button>
             </div>
 
-            {/* Divider */}
-            <div className="divider-container">
-              <div className="divider-line"></div>
-              <span className="divider-text">or</span>
-              <div className="divider-line"></div>
+            <div className="forgot-password-container">
+              <button onClick={handleForgotPassword} className="forgot-password-link" style={{background:'none', border:'none', cursor:'pointer', padding:0}}>
+                Forgot password?
+              </button>
             </div>
 
-            {/* Create Account Link */}
-            <div className="create-account-container">
-              <span className="create-account-text">Don't have an account? </span>
-              <a href="#" className="create-account-link">
-                Create account
-              </a>
+            <div className="checkbox-container">
+              <input
+                type="checkbox"
+                id="keepLoggedIn"
+                checked={keepLoggedIn}
+                onChange={handleCheckboxChange}
+                className="checkbox-input"
+              />
+              <label htmlFor="keepLoggedIn" className="checkbox-label">
+                Keep me logged in
+              </label>
             </div>
+
+            <button
+              type="submit"
+              className="login-button"
+            >
+              Login
+            </button>
+          </form>
+
+          <div className="divider-container">
+            <div className="divider-line"></div>
+            <span className="divider-text">or</span>
+            <div className="divider-line"></div>
+          </div>
+
+          <div className="create-account-container">
+            <span className="create-account-text">Don't have an account? </span>
+            <Link to="/register" className="create-account-link">
+              Create account
+            </Link>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }

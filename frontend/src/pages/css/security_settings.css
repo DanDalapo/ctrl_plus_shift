@@ -1,77 +1,42 @@
-.security-section h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 0.25rem;
-  margin-top: 0;
-}
-
-.section-description {
-  font-size: 0.95rem;
-  color: #666;
-  margin-bottom: 2rem;
-  margin-top: 0;
-}
-
-/* Sub-header for the form */
 .security-subhead {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-/* Form Layout */
 .password-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 500px; 
 }
 
-.form-group-security {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
 }
 
-.form-group-security label {
-  font-size: 0.95rem;
-  color: #333;
-  font-weight: 400; /* Regular weight as per screenshot */
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
 }
 
-/* Gray bar inputs matching the screenshot */
-.security-input {
-  width: 100%;
-  padding: 0.85rem 1rem;
-  background-color: #dcdcdc; /* Gray background */
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #333;
-  outline: none;
-}
-
-.security-input:focus {
-  box-shadow: 0 0 0 2px #000; /* Subtle focus ring */
-}
-
-/* Black Button */
-.update-pass-btn {
-  background-color: #000;
-  color: #fff;
-  padding: 0.75rem 2rem;
-  border-radius: 6px;
-  border: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  width: fit-content;
-  margin-top: 1rem;
-  transition: background-color 0.2s;
-}
-
-.update-pass-btn:hover {
-  background-color: #333;
+.password-toggle-btn:hover {
+    color: var(--text-dark);
+    background-color: rgba(0,0,0,0.05);
 }
