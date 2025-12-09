@@ -1,65 +1,54 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Ensure Link is imported
 import './css/home.css';
 
-export default class HomePage extends React.Component {
-  constructor(props) {
-    super(props);
+export default function HomePage() {
+    // State for User Data
+    const [currentUser, setCurrentUser] = useState(null);
     
-    // Get user data from localStorage or sessionStorage
-    const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-    
-    this.state = {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      userData: userData,
-      fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim() || 'John Doe',
-      firstName: userData.firstname || 'John',
-      userType: userData.userType || 'VOTER'
+    // State for Timer
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+    // API Configuration
+    const API_URL = "http://localhost:8080";
+    const userId = 1; // Mock User ID
+
+    // Fetch User Data
+    useEffect(() => {
+        fetch(`${API_URL}/users/${userId}`)
+            .then(res => res.json())
+            .then(data => setCurrentUser(data))
+            .catch(err => console.error("Failed to load user", err));
+    }, []);
+
+    // Timer Logic
+    useEffect(() => {
+        const eventDate = new Date("October 20, 2025 23:59:00").getTime();
+        
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            if (distance > 0) {
+                setTimeLeft({
+                    days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                    minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+                    seconds: Math.floor((distance % (1000 * 60)) / 1000)
+                });
+            }
+        };
+
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Initial call
+
+        return () => clearInterval(timerInterval);
+    }, []);
+
+    const getInitials = (first, last) => {
+        if (!first || !last) return "??";
+        return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
     };
-  }
-
-  componentDidMount() {
-    this.updateTimer();
-    this.timerInterval = setInterval(this.updateTimer, 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerInterval);
-  }
-
-  getInitials = () => {
-    const { firstname, lastName } = this.state.userData;
-    const firstInitial = (firstname || '').charAt(0).toUpperCase();
-    const lastInitial = (lastName || '').charAt(0).toUpperCase();
-    return firstInitial + lastInitial || 'JD';
-  }
-
-  updateTimer = () => {
-    const eventDate = new Date("October 20, 2025 23:59:00").getTime();
-    const now = new Date().getTime();
-    const distance = eventDate - now;
-
-    if (distance > 0) {
-      this.setState({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000)
-      });
-    } else {
-      clearInterval(this.timerInterval);
-    }
-  };
-
-  handlePlaceholderClick = (e) => {
-    e.preventDefault();
-  }
-
-  render() {
-    const { days, hours, minutes, seconds } = this.state;
 
     const newsItems = [
       {
@@ -68,7 +57,7 @@ export default class HomePage extends React.Component {
         date: "Dec 09, 2025",
         tag: "University",
         image: "/79 CIT.png", 
-        excerpt: "Today, the Technologian community celebrates the 79th Founder's Day of the institution, honoring the legacy of the late and former University President Nicholas G. Escario Sr. Established in 1946, in the wake of a war, Cebu Institute of Technology–University (CIT–U) sprang as a gear of hope with the leadership of Dr. Escario Sr."
+        excerpt: "Today, the Technologian community celebrates the 79th Founder's Day of the institution, honoring the legacy of the late and former University President Nicholas G. Escario Sr."
       },
       {
         id: 2,
@@ -76,7 +65,7 @@ export default class HomePage extends React.Component {
         date: "Dec 05, 2025",
         tag: "Achievement",
         image: "/News Update.png",
-        excerpt: "Dominating the tech contest for three consecutive years, the Cebu Institute of Technology–University (CIT–U) won three awards at the 10th Huawei ICT Competition, with the awarding ceremony held today, December 5. Three teams represented CIT–U in different categories, competing against various universities across the country."
+        excerpt: "Dominating the tech contest for three consecutive years, the Cebu Institute of Technology–University (CIT–U) won three awards at the 10th Huawei ICT Competition."
       }
     ];
 
@@ -93,11 +82,17 @@ export default class HomePage extends React.Component {
 
           <div className="user-profile-compact">
             <div className="avatar-circle">
-              <span className="initials">{this.getInitials()}</span>
+              <span className="initials">
+                  {currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}
+              </span>
             </div>
             <div className="user-info-compact">
-              <h4 className="user-name">{this.state.fullName}</h4>
-              <span className="user-role">{this.state.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter'}</span>
+              <h4 className="user-name">
+                  {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}
+              </h4>
+              <span className="user-role">
+                  {currentUser ? (currentUser.userType || 'Student Voter') : ''}
+              </span>
             </div>
           </div>
 
@@ -118,7 +113,6 @@ export default class HomePage extends React.Component {
                 <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 Results
             </Link>
-            {/* FIXED SETTINGS ICON */}
             <Link to="/settings" className="nav-item">
               <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
               Settings
@@ -134,15 +128,12 @@ export default class HomePage extends React.Component {
         </aside>
 
         <main className="main-content">
-          
           <div className="content-scrollable">
-            
             <section className="welcome-banner">
               <div className="banner-text">
-                <h1>Welcome back, {this.state.firstName}</h1>
+                <h1>Welcome back, {currentUser ? currentUser.firstName : 'Technologian'}</h1>
                 <p>The 2025 Student Council Elections are fast approaching. Make sure you're informed and ready to vote.</p>
               </div>
-              
               <div className="feature-stats">
                 <div className="stat-item">
                   <span className="stat-val">12</span>
@@ -157,9 +148,7 @@ export default class HomePage extends React.Component {
             </section>
 
             <div className="dashboard-grid">
-              
               <div className="grid-column-left">
-                
                 <section className="dashboard-card timer-card">
                   <div className="card-header">
                     <h3>
@@ -168,29 +157,20 @@ export default class HomePage extends React.Component {
                     </h3>
                   </div>
                   <div className="countdown-display">
-                    <div className="time-unit">
-                      <span className="unit-value">{days}</span>
-                      <span className="unit-label">Days</span>
-                    </div>
-                    <span className="colon">:</span>
-                    <div className="time-unit">
-                      <span className="unit-value">{hours}</span>
-                      <span className="unit-label">Hrs</span>
-                    </div>
-                    <span className="colon">:</span>
-                    <div className="time-unit">
-                      <span className="unit-value">{minutes}</span>
-                      <span className="unit-label">Mins</span>
-                    </div>
-                    <span className="colon">:</span>
-                    <div className="time-unit">
-                      <span className="unit-value">{seconds}</span>
-                      <span className="unit-label">Secs</span>
-                    </div>
+                    {['Days', 'Hrs', 'Mins', 'Secs'].map((label, idx) => {
+                         const val = [timeLeft.days, timeLeft.hours, timeLeft.minutes, timeLeft.seconds][idx];
+                         return (
+                            <React.Fragment key={label}>
+                                <div className="time-unit">
+                                    <span className="unit-value">{val}</span>
+                                    <span className="unit-label">{label}</span>
+                                </div>
+                                {idx < 3 && <span className="colon">:</span>}
+                            </React.Fragment>
+                         )
+                    })}
                   </div>
-                  <div className="timer-footer">
-                    Voting closes on <strong>Oct 20, 2025</strong>
-                  </div>
+                  <div className="timer-footer">Voting closes on <strong>Oct 20, 2025</strong></div>
                 </section>
 
                  <section className="quick-actions">
@@ -211,7 +191,7 @@ export default class HomePage extends React.Component {
                     </div>
                  </section>
               </div>
-
+              
               <div className="grid-column-right">
                 <section className="dashboard-card news-section">
                   <div className="card-header">
@@ -219,9 +199,11 @@ export default class HomePage extends React.Component {
                       <svg className="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
                       Latest News
                     </h3>
-                    <a href="#" onClick={this.handlePlaceholderClick} className="view-all-link">View All</a>
-                  </div>
+                    
+                    {/* FIXED LINE BELOW: Changed <a> to <Link> */}
+                    <Link to="/news" className="view-all-link">View All</Link>
 
+                  </div>
                   <div className="news-list">
                     {newsItems.map(item => (
                       <div className="news-item" key={item.id}>
@@ -232,21 +214,16 @@ export default class HomePage extends React.Component {
                             <span className="news-date">{item.date}</span>
                           </div>
                           <h4 className="news-title">{item.title}</h4>
-                          <p className="news-excerpt">
-                            {item.excerpt}
-                          </p>
-                          <a href="#" onClick={this.handlePlaceholderClick} className="read-more-link">Read full story →</a>
+                          <p className="news-excerpt">{item.excerpt}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </section>
               </div>
-
             </div>
           </div>
         </main>
       </div>
     );
-  }
 }

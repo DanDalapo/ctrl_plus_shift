@@ -1,32 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './css/account_settings.css';
-import './css/home.css'; // Import shared dashboard styles
+import './css/home.css';
 
-export default class AccountSettings extends React.Component {
-  constructor(props) {
-    super(props);
-    
-    // Get user data from localStorage or sessionStorage
-    const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-    
-    this.state = {
-      userData: userData,
-      fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim() || 'John Doe',
-      email: userData.email || 'student@cit.edu',
-      studentID: userData.strStudentID || '00-0000-000',
-      userType: userData.userType || 'VOTER'
+export default function AccountSettings() {
+    // State
+    const [currentUser, setCurrentUser] = useState(null);
+
+    // API Config
+    const API_URL = "http://localhost:8080";
+    const userId = 1;
+
+    useEffect(() => {
+        fetch(`${API_URL}/users/${userId}`)
+            .then(res => res.json())
+            .then(data => setCurrentUser(data))
+            .catch(err => console.error("Failed to load user", err));
+    }, []);
+
+    const getInitials = (first, last) => {
+        if (!first || !last) return "??";
+        return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
     };
-  }
 
-  getInitials = () => {
-    const { firstname, lastName } = this.state.userData;
-    const firstInitial = (firstname || '').charAt(0).toUpperCase();
-    const lastInitial = (lastName || '').charAt(0).toUpperCase();
-    return firstInitial + lastInitial || 'JD';
-  }
-
-  render() {
     return (
       <div className="dashboard-container">
         
@@ -41,11 +37,17 @@ export default class AccountSettings extends React.Component {
 
           <div className="user-profile-compact">
             <div className="avatar-circle">
-              <span className="initials">{this.getInitials()}</span>
+              <span className="initials">
+                  {currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}
+              </span>
             </div>
             <div className="user-info-compact">
-              <h4 className="user-name">{this.state.fullName}</h4>
-              <span className="user-role">{this.state.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter'}</span>
+              <h4 className="user-name">
+                  {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}
+              </h4>
+              <span className="user-role">
+                  {currentUser ? (currentUser.userType || 'Student Voter') : ''}
+              </span>
             </div>
           </div>
 
@@ -89,7 +91,6 @@ export default class AccountSettings extends React.Component {
               <p>Manage your personal information and preferences.</p>
             </div>
 
-            {/* Navigation Tabs - Updated to use Links */}
             <div className="settings-tabs">
               <Link to="/settings" className="tab-button">Profile</Link>
               <Link to="/settings/account" className="tab-button active">Account</Link>
@@ -106,16 +107,14 @@ export default class AccountSettings extends React.Component {
                 </div>
 
                 <div className="account-details-grid">
-                  {/* Student ID */}
                   <div className="detail-item">
                     <label>Student ID</label>
                     <div className="detail-value">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px', color: 'var(--text-muted)'}}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                      {this.state.studentID}
+                      {currentUser ? (currentUser.strStudentID || 'N/A') : 'Loading...'}
                     </div>
                   </div>
 
-                  {/* Account Status */}
                   <div className="detail-item">
                     <label>Account Status</label>
                     <div className="detail-value status-active">
@@ -124,12 +123,12 @@ export default class AccountSettings extends React.Component {
                     </div>
                   </div>
 
-                  {/* Elections Participated */}
                   <div className="detail-item full-width">
                     <label>Elections Participated</label>
                     <div className="detail-value">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px', color: 'var(--text-muted)'}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                      2 Elections
+                      {/* This could be dynamic later if you add a votes count to the User entity */}
+                      0 Elections
                     </div>
                   </div>
                 </div>
@@ -140,5 +139,4 @@ export default class AccountSettings extends React.Component {
         </main>
       </div>
     );
-  }
 }
