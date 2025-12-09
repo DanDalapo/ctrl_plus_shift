@@ -19,7 +19,14 @@ public class UserController {
     }
 
     @PostMapping
-    public UserEntity create(@RequestBody UserEntity u) { return service.create(u); }
+    public ResponseEntity<?> create(@RequestBody UserEntity u) {
+        try {
+            UserEntity createdUser = service.create(u);
+            return ResponseEntity.ok(createdUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
     @PostMapping("/login")
     
     public ResponseEntity<?> login(@RequestBody UserEntity loginDetails) {

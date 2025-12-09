@@ -7,13 +7,24 @@ import './css/home.css';
 export default class SecuritySettings extends React.Component {
     constructor(props) {
         super(props);
+        
+        // Get user data from localStorage or sessionStorage
+        const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+        
         this.state = {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-        showCurrentPassword: false,
-        showNewPassword: false,
-        showConfirmPassword: false
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+            showCurrentPassword: false,
+            showNewPassword: false,
+            showConfirmPassword: false,
+            userData: userData,
+            fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim() || 'John Doe',
+            userType: userData.userType || 'VOTER',
+            showError: false,
+            errorMessage: '',
+            showSuccess: false,
+            isLoading: false
         };
     }
 
@@ -26,6 +37,84 @@ export default class SecuritySettings extends React.Component {
         this.setState(prevState => ({
         [field]: !prevState[field]
         }));
+    }
+
+    getInitials = () => {
+        const { firstname, lastName } = this.state.userData;
+        const firstInitial = (firstname || '').charAt(0).toUpperCase();
+        const lastInitial = (lastName || '').charAt(0).toUpperCase();
+        return firstInitial + lastInitial || 'JD';
+    }
+
+    triggerError = (message) => {
+        this.setState({ errorMessage: message, showError: true });
+    }
+
+    closeError = () => {
+        this.setState({ showError: false });
+    }
+
+    closeSuccess = () => {
+        this.setState({ showSuccess: false, currentPassword: '', newPassword: '', confirmPassword: '' });
+    }
+
+    handlePasswordChange = async () => {
+        const { currentPassword, newPassword, confirmPassword, userData } = this.state;
+        
+        // Validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            this.triggerError('Please fill in all password fields.');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            this.triggerError('New passwords do not match.');
+            return;
+        }
+        
+        if (currentPassword === newPassword) {
+            this.triggerError('New password must be different from current password.');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            this.triggerError('New password must be at least 6 characters long.');
+            return;
+        }
+        
+        this.setState({ isLoading: true });
+        
+        try {
+            const response = await fetch(`http://localhost:8080/users/${userData.userID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    password: newPassword,
+                    userID: userData.userID,
+                    firstname: userData.firstname,
+                    lastName: userData.lastName,
+                    dateOfBirth: userData.dateOfBirth,
+                    email: userData.email,
+                    userType: userData.userType,
+                    strStudentID: userData.strStudentID,
+                    bio: userData.bio
+                }),
+            });
+            
+            if (response.ok) {
+                this.setState({ showSuccess: true, isLoading: false });
+            } else {
+                const errorText = await response.text();
+                this.triggerError('Failed to update password. Please try again.');
+                this.setState({ isLoading: false });
+            }
+        } catch (error) {
+            console.error('Password change error:', error);
+            this.triggerError('Unable to connect to server. Please try again later.');
+            this.setState({ isLoading: false });
+        }
     }
 
     render() {
@@ -43,11 +132,11 @@ export default class SecuritySettings extends React.Component {
 
             <div className="user-profile-compact">
                 <div className="avatar-circle">
-                <span className="initials">JD</span>
+                <span className="initials">{this.getInitials()}</span>
                 </div>
                 <div className="user-info-compact">
-                <h4 className="user-name">John Doe</h4>
-                <span className="user-role">Student Voter</span>
+                <h4 className="user-name">{this.state.fullName}</h4>
+                <span className="user-role">{this.state.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter'}</span>
                 </div>
             </div>
 
@@ -85,6 +174,42 @@ export default class SecuritySettings extends React.Component {
 
             {/* MAIN CONTENT */}
             <main className="main-content">
+            
+            {/* ERROR MODAL */}
+            {this.state.showError && (
+                <div className="modal-overlay">
+                <div className="modal-content">
+                    <div className="modal-icon" style={{color: '#ef4444'}}>⚠️</div>
+                    <h3 className="modal-title">Error</h3>
+                    <p className="modal-message">{this.state.errorMessage}</p>
+                    <button onClick={this.closeError} className="modal-button">
+                    Try Again
+                    </button>
+                </div>
+                </div>
+            )}
+            
+            {/* SUCCESS MODAL */}
+            {this.state.showSuccess && (
+                <div className="modal-overlay">
+                <div className="modal-content">
+                    <div className="modal-icon" style={{color: '#16a34a'}}>
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    </div>
+                    <h3 className="modal-title">Success</h3>
+                    <p className="modal-message">
+                    Your password has been successfully updated. Please log in with your new password.
+                    </p>
+                    <button onClick={this.closeSuccess} className="modal-button">
+                    Close
+                    </button>
+                </div>
+                </div>
+            )}
+            
             <div className="content-scrollable">
                 
                 <div className="settings-header-block">
@@ -196,7 +321,13 @@ export default class SecuritySettings extends React.Component {
                     </div>
 
                     <div className="form-actions">
-                        <button className="save-btn">Update Password</button>
+                        <button 
+                            className="save-btn" 
+                            onClick={this.handlePasswordChange}
+                            disabled={this.state.isLoading}
+                        >
+                            {this.state.isLoading ? 'Updating...' : 'Update Password'}
+                        </button>
                     </div>
                     </div>
 

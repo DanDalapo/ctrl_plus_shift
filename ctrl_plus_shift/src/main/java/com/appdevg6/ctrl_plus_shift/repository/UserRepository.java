@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     // This automagically creates a query: SELECT * FROM users WHERE email = ?
     UserEntity findByEmail(String email);
+    
+    // Check if student ID already exists
+    UserEntity findByStrStudentID(String strStudentID);
 }

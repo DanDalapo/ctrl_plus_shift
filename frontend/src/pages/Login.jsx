@@ -9,6 +9,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [keepLoggedIn, setKeepLoggedIn] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -26,23 +28,76 @@ export default function LoginPage() {
     setShowPassword(!showPassword);
   }
 
+  const triggerError = (message) => {
+    setErrorMessage(message);
+    setShowError(true);
+  }
+
+  const closeError = () => {
+    setShowError(false);
+  }
+
   const handleForgotPassword = (e) => {
     e.preventDefault();
     console.log("Forgot password clicked");
   }
 
-  const handleSubmit = () => {
-    console.log('Login submitted:', {
-      email,
-      password,
-      keepLoggedIn
-    });
-    
-    navigate('/home');
+  const handleSubmit = async () => {
+    if (!email || !password) {
+      triggerError('Please enter both email and password.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        }),
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+        console.log('Login successful:', user);
+        
+        // Store user data in localStorage if "keep logged in" is checked
+        if (keepLoggedIn) {
+          localStorage.setItem('user', JSON.stringify(user));
+        } else {
+          sessionStorage.setItem('user', JSON.stringify(user));
+        }
+        
+        navigate('/home');
+      } else {
+        const errorText = await response.text();
+        triggerError(errorText || 'Invalid email or password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      triggerError('Unable to connect to server. Please try again later.');
+    }
   }
 
   return (
     <div className="login-container">
+      {/* ERROR MODAL */}
+      {showError && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-icon" style={{color: '#ef4444'}}>⚠️</div>
+            <h3 className="modal-title">Login Failed</h3>
+            <p className="modal-message">{errorMessage}</p>
+            <button onClick={closeError} className="modal-button">
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="welcome-panel">
         <h1 className="welcome-title">
           Welcome<br />Back!
