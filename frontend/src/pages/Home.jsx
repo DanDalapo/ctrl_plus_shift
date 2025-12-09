@@ -5,11 +5,19 @@ import './css/home.css';
 export default class HomePage extends React.Component {
   constructor(props) {
     super(props);
+    
+    // Get user data from localStorage or sessionStorage
+    const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+    
     this.state = {
       days: 0,
       hours: 0,
       minutes: 0,
-      seconds: 0
+      seconds: 0,
+      userData: userData,
+      fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim() || 'John Doe',
+      firstName: userData.firstname || 'John',
+      userType: userData.userType || 'VOTER'
     };
   }
 
@@ -20,6 +28,13 @@ export default class HomePage extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.timerInterval);
+  }
+
+  getInitials = () => {
+    const { firstname, lastName } = this.state.userData;
+    const firstInitial = (firstname || '').charAt(0).toUpperCase();
+    const lastInitial = (lastName || '').charAt(0).toUpperCase();
+    return firstInitial + lastInitial || 'JD';
   }
 
   updateTimer = () => {
@@ -78,11 +93,11 @@ export default class HomePage extends React.Component {
 
           <div className="user-profile-compact">
             <div className="avatar-circle">
-              <span className="initials">JD</span>
+              <span className="initials">{this.getInitials()}</span>
             </div>
             <div className="user-info-compact">
-              <h4 className="user-name">John Doe</h4>
-              <span className="user-role">Student Voter</span>
+              <h4 className="user-name">{this.state.fullName}</h4>
+              <span className="user-role">{this.state.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter'}</span>
             </div>
           </div>
 
@@ -124,7 +139,7 @@ export default class HomePage extends React.Component {
             
             <section className="welcome-banner">
               <div className="banner-text">
-                <h1>Welcome back, John</h1>
+                <h1>Welcome back, {this.state.firstName}</h1>
                 <p>The 2025 Student Council Elections are fast approaching. Make sure you're informed and ready to vote.</p>
               </div>
               

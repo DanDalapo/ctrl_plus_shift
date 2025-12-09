@@ -1,10 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './css/landing.css';
 
-export default class LandingPage extends React.Component {
-  render() {
-    return (
+export default function LandingPage() {
+  const navigate = useNavigate();
+
+  const handleUserTypeSelection = (userType) => {
+    navigate('/register', { state: { userType } });
+  }
+
+  return (
       <div className="landing-container">
         {/* Main Header Section */}
         <header className="landing-header">
@@ -55,10 +60,13 @@ export default class LandingPage extends React.Component {
               </li>
             </ul>
             
-            {/* UPDATED: Directs to Login instead of Register */}
-            <Link to="/login" className="card-button candidate-button">
+            <button 
+              onClick={() => handleUserTypeSelection('CANDIDATE')} 
+              className="card-button candidate-button"
+              style={{border: 'none', cursor: 'pointer'}}
+            >
               Continue as Candidate
-            </Link>
+            </button>
           </div>
 
           {/* Vertical Divider */}
@@ -94,14 +102,16 @@ export default class LandingPage extends React.Component {
               </li>
             </ul>
             
-            {/* UPDATED: Directs to Login instead of Home */}
-            <Link to="/login" className="card-button voter-button">
+            <button 
+              onClick={() => handleUserTypeSelection('VOTER')} 
+              className="card-button voter-button"
+              style={{border: 'none', cursor: 'pointer'}}
+            >
               Continue as Voter
-            </Link>
+            </button>
           </div>
 
         </div>
       </div>
     );
-  }
 }

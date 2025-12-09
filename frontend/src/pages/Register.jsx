@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './css/register.css';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // State for form fields
   const [formData, setFormData] = useState({
@@ -14,8 +15,19 @@ export default function RegisterPage() {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
-    agreeTerms: false
+    agreeTerms: false,
+    userType: 'VOTER'
   });
+
+  // Get userType from navigation state
+  useEffect(() => {
+    if (location.state?.userType) {
+      setFormData(prev => ({
+        ...prev,
+        userType: location.state.userType
+      }));
+    }
+  }, [location]);
 
   // State for UI toggles
   const [showPassword, setShowPassword] = useState(false);
@@ -62,8 +74,8 @@ export default function RegisterPage() {
     e.preventDefault();
   }
 
-  const handleSubmit = () => {
-    const { firstName, lastName, dob, email, phoneNumber, password, confirmPassword, agreeTerms } = formData;
+  const handleSubmit = async () => {
+    const { firstName, lastName, dob, email, phoneNumber, password, confirmPassword, agreeTerms, userType } = formData;
     
     // 1. Check if any text field is empty
     if (!firstName || !lastName || !dob || !email || !phoneNumber || !password || !confirmPassword) {
@@ -83,9 +95,37 @@ export default function RegisterPage() {
       return;
     }
 
-    // Validation passed - Show Success Modal
-    console.log('Register submitted:', formData);
-    setShowSuccess(true);
+    // API call to create user
+    try {
+      const response = await fetch('http://localhost:8080/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstname: firstName,
+          lastName: lastName,
+          dateOfBirth: dob,
+          email: email,
+          strStudentID: phoneNumber,
+          password: password,
+          userType: userType,
+          bio: ''
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User registered successfully:', data);
+        setShowSuccess(true);
+      } else {
+        const errorText = await response.text();
+        triggerError('Registration failed: ' + errorText);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      triggerError('Unable to connect to server. Please try again later.');
+    }
   }
 
   return (

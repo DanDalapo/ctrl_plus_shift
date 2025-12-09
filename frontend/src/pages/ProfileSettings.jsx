@@ -6,14 +6,30 @@ import './css/home.css'; // Import shared dashboard styles
 export default class ProfileSettings extends React.Component {
   constructor(props) {
     super(props);
+    
+    // Get user data from localStorage or sessionStorage
+    const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+    
     this.state = {
-      fullName: 'student name',
-      email: 'assdqweqwe@cit.edu',
-      idNumber: '19-3426-765', // Updated from phone number
-      dob: 'mm/dd/yy',
-      bio: '',
-      bioCharCount: 0
+      fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim() || 'student name',
+      email: userData.email || 'assdqweqwe@cit.edu',
+      idNumber: userData.strStudentID || '19-3426-765',
+      dob: userData.dateOfBirth || 'mm/dd/yy',
+      bio: userData.bio || '',
+      bioCharCount: (userData.bio || '').length,
+      userData: userData,
+      showError: false,
+      errorMessage: '',
+      showSuccess: false,
+      isLoading: false
     };
+  }
+
+  getInitials = () => {
+    const { firstname, lastName } = this.state.userData;
+    const firstInitial = (firstname || '').charAt(0).toUpperCase();
+    const lastInitial = (lastName || '').charAt(0).toUpperCase();
+    return firstInitial + lastInitial || 'JD';
   }
 
   handleInputChange = (e) => {
@@ -22,6 +38,73 @@ export default class ProfileSettings extends React.Component {
     
     if (name === 'bio') {
       this.setState({ bioCharCount: value.length });
+    }
+  }
+
+  triggerError = (message) => {
+    this.setState({ errorMessage: message, showError: true });
+  }
+
+  closeError = () => {
+    this.setState({ showError: false });
+  }
+
+  closeSuccess = () => {
+    this.setState({ showSuccess: false });
+  }
+
+  handleSaveChanges = async () => {
+    const { bio, userData } = this.state;
+
+    if (!bio || bio.trim().length === 0) {
+      this.triggerError('Bio cannot be empty.');
+      return;
+    }
+
+    if (bio.length > 500) {
+      this.triggerError('Bio cannot exceed 500 characters.');
+      return;
+    }
+
+    this.setState({ isLoading: true });
+
+    try {
+      const response = await fetch(`http://localhost:8080/users/${userData.userID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bio: bio,
+          userID: userData.userID,
+          firstname: userData.firstname,
+          lastName: userData.lastName,
+          dateOfBirth: userData.dateOfBirth,
+          email: userData.email,
+          userType: userData.userType,
+          strStudentID: userData.strStudentID,
+          password: userData.password
+        }),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        // Update localStorage/sessionStorage with new user data
+        if (localStorage.getItem('user')) {
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        } else {
+          sessionStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+        
+        this.setState({ showSuccess: true, isLoading: false });
+      } else {
+        this.triggerError('Failed to update bio. Please try again.');
+        this.setState({ isLoading: false });
+      }
+    } catch (error) {
+      console.error('Bio update error:', error);
+      this.triggerError('Unable to connect to server. Please try again later.');
+      this.setState({ isLoading: false });
     }
   }
 
@@ -40,11 +123,11 @@ export default class ProfileSettings extends React.Component {
 
           <div className="user-profile-compact">
             <div className="avatar-circle">
-              <span className="initials">JD</span>
+              <span className="initials">{this.getInitials()}</span>
             </div>
             <div className="user-info-compact">
-              <h4 className="user-name">John Doe</h4>
-              <span className="user-role">Student Voter</span>
+              <h4 className="user-name">{this.state.fullName}</h4>
+              <span className="user-role">{this.state.userData.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter'}</span>
             </div>
           </div>
 
@@ -81,6 +164,42 @@ export default class ProfileSettings extends React.Component {
 
         {/* MAIN SETTINGS CONTENT */}
         <main className="main-content">
+
+          {/* ERROR MODAL */}
+          {this.state.showError && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <div className="modal-icon" style={{color: '#ef4444'}}>⚠️</div>
+                <h3 className="modal-title">Error</h3>
+                <p className="modal-message">{this.state.errorMessage}</p>
+                <button onClick={this.closeError} className="modal-button">
+                  Try Again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* SUCCESS MODAL */}
+          {this.state.showSuccess && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <div className="modal-icon" style={{color: '#16a34a'}}>
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <h3 className="modal-title">Success</h3>
+                <p className="modal-message">
+                  Your bio has been successfully updated.
+                </p>
+                <button onClick={this.closeSuccess} className="modal-button">
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="content-scrollable">
             
             <div className="settings-header-block">
@@ -184,8 +303,12 @@ export default class ProfileSettings extends React.Component {
                 <hr className="divider" />
 
                 <div className="form-actions">
-                  <button className="save-btn">
-                    Save Changes
+                  <button 
+                    className="save-btn"
+                    onClick={this.handleSaveChanges}
+                    disabled={this.state.isLoading}
+                  >
+                    {this.state.isLoading ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
 

@@ -4,6 +4,28 @@ import './css/account_settings.css';
 import './css/home.css'; // Import shared dashboard styles
 
 export default class AccountSettings extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    // Get user data from localStorage or sessionStorage
+    const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+    
+    this.state = {
+      userData: userData,
+      fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim() || 'John Doe',
+      email: userData.email || 'student@cit.edu',
+      studentID: userData.strStudentID || '00-0000-000',
+      userType: userData.userType || 'VOTER'
+    };
+  }
+
+  getInitials = () => {
+    const { firstname, lastName } = this.state.userData;
+    const firstInitial = (firstname || '').charAt(0).toUpperCase();
+    const lastInitial = (lastName || '').charAt(0).toUpperCase();
+    return firstInitial + lastInitial || 'JD';
+  }
+
   render() {
     return (
       <div className="dashboard-container">
@@ -19,11 +41,11 @@ export default class AccountSettings extends React.Component {
 
           <div className="user-profile-compact">
             <div className="avatar-circle">
-              <span className="initials">JD</span>
+              <span className="initials">{this.getInitials()}</span>
             </div>
             <div className="user-info-compact">
-              <h4 className="user-name">John Doe</h4>
-              <span className="user-role">Student Voter</span>
+              <h4 className="user-name">{this.state.fullName}</h4>
+              <span className="user-role">{this.state.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter'}</span>
             </div>
           </div>
 
@@ -89,7 +111,7 @@ export default class AccountSettings extends React.Component {
                     <label>Student ID</label>
                     <div className="detail-value">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px', color: 'var(--text-muted)'}}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                      00-0000-000
+                      {this.state.studentID}
                     </div>
                   </div>
 

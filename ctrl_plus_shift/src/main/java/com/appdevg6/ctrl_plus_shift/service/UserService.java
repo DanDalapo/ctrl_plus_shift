@@ -27,6 +27,18 @@ public class UserService {
     }
 
     public UserEntity create(UserEntity user) {
+        // Check if email already exists
+        if (userRepo.findByEmail(user.getEmail()) != null) {
+            throw new RuntimeException("Email is already registered");
+        }
+        
+        // Check if student ID already exists
+        if (user.getStrStudentID() != null && !user.getStrStudentID().isEmpty()) {
+            if (userRepo.findByStrStudentID(user.getStrStudentID()) != null) {
+                throw new RuntimeException("Student ID is already in use");
+            }
+        }
+        
         UserEntity savedUser = userRepo.save(user);
 
         String type = savedUser.getUserType();
