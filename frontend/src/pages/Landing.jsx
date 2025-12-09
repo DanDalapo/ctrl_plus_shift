@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 import './css/landing.css';
 
 export default class LandingPage extends React.Component {
-  
-  handleSelection = (type) => {
-    // We save this to localStorage so Register.jsx can read it even after a page reload
-    localStorage.setItem('selectedUserType', type);
-  }
-
   render() {
     return (
       <div className="landing-container">
@@ -30,6 +24,7 @@ export default class LandingPage extends React.Component {
           {/* Candidate Card (Left) */}
           <div className="landing-card candidate-card">
             <div className="card-icon-wrapper candidate-icon-wrapper">
+              {/* White Circle with Gold Star */}
               <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" fill="white" />
                 <path 
@@ -42,18 +37,26 @@ export default class LandingPage extends React.Component {
             <p className="card-subtitle">Run for office and lead your peers</p>
             
             <ul className="benefit-list">
-              <li><span className="check-icon candidate-check">✓</span> Create and manage your campaign profile</li>
-              <li><span className="check-icon candidate-check">✓</span> Share your platform and vision</li>
-              <li><span className="check-icon candidate-check">✓</span> Monitor your campaign progress</li>
-              <li><span className="check-icon candidate-check">✓</span> Engage with voters and answer questions</li>
+              <li>
+                <span className="check-icon candidate-check">✓</span>
+                Create and manage your campaign profile
+              </li>
+              <li>
+                <span className="check-icon candidate-check">✓</span>
+                Share your platform and vision
+              </li>
+              <li>
+                <span className="check-icon candidate-check">✓</span>
+                Monitor your campaign progress
+              </li>
+              <li>
+                <span className="check-icon candidate-check">✓</span>
+                Engage with voters and answer questions
+              </li>
             </ul>
             
-            {/* 2. Added onClick to save 'Candidate' */}
-            <Link 
-              to="/register" 
-              className="card-button candidate-button"
-              onClick={() => this.handleSelection('Candidate')}
-            >
+            {/* UPDATED: Directs to Login instead of Register */}
+            <Link to="/login" className="card-button candidate-button">
               Continue as Candidate
             </Link>
           </div>
@@ -64,6 +67,7 @@ export default class LandingPage extends React.Component {
           {/* Voter Card (Right) */}
           <div className="landing-card voter-card">
             <div className="card-icon-wrapper voter-icon-wrapper">
+              {/* Single Person Icon */}
               <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
@@ -72,18 +76,26 @@ export default class LandingPage extends React.Component {
             <p className="card-subtitle">Cast your vote and make your voice heard</p>
             
             <ul className="benefit-list">
-              <li><span className="check-icon voter-check">✓</span> View all candidates and their platforms</li>
-              <li><span className="check-icon voter-check">✓</span> Participate in all active elections</li>
-              <li><span className="check-icon voter-check">✓</span> Track results in real-time</li>
-              <li><span className="check-icon voter-check">✓</span> Get notified about new elections</li>
+              <li>
+                <span className="check-icon voter-check">✓</span>
+                View all candidates and their platforms
+              </li>
+              <li>
+                <span className="check-icon voter-check">✓</span>
+                Participate in all active elections
+              </li>
+              <li>
+                <span className="check-icon voter-check">✓</span>
+                Track results in real-time
+              </li>
+              <li>
+                <span className="check-icon voter-check">✓</span>
+                Get notified about new elections
+              </li>
             </ul>
             
-            {/* 3. Changed path to /register and added onClick to save 'Voter' */}
-            <Link 
-              to="/register" 
-              className="card-button voter-button"
-              onClick={() => this.handleSelection('Voter')}
-            >
+            {/* UPDATED: Directs to Login instead of Home */}
+            <Link to="/login" className="card-button voter-button">
               Continue as Voter
             </Link>
           </div>

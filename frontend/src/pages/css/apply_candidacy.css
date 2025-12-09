@@ -1,0 +1,211 @@
+/* Spacing for the header */
+.apply-header-spacing {
+	margin-bottom: 2.5rem;
+}
+
+/* Card Styling - Looser padding */
+.application-card {
+	max-width: 900px;
+	margin-bottom: 4rem;
+	padding: 3.5rem; 
+}
+
+/* Section Titles */
+.form-section-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--text-dark);
+	margin-bottom: 1.5rem;
+	margin-top: 2.5rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section-title:first-of-type {
+	margin-top: 0;
+}
+
+/* Looser Grid and Groups */
+.loose-grid {
+	gap: 2.5rem;
+}
+
+.loose-group {
+	margin-bottom: 2rem;
+}
+
+/* Extra Margin Top for Bio */
+.bio-spacing {
+	margin-top: 3rem; 
+}
+
+/* Select Input Arrow Styling */
+.select-input {
+	appearance: none;
+	background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+	background-repeat: no-repeat;
+	background-position: right 1rem center;
+	background-size: 0.65em auto;
+}
+
+.text-area-large {
+	min-height: 180px;
+}
+
+/* Upload Area */
+.upload-container {
+	margin-bottom: 2rem;
+}
+
+.upload-box {
+	width: 100%;
+}
+
+.file-input-hidden {
+	display: none;
+}
+
+.upload-label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem;
+	border: 2px dashed #d1d5db;
+	border-radius: var(--radius-md);
+	background-color: #f9fafb;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.upload-label:hover {
+	border-color: var(--primary-red);
+	background-color: #fef2f2;
+}
+
+.upload-icon {
+	color: var(--text-muted);
+	margin-bottom: 1rem;
+	transform: scale(1.2);
+}
+
+.upload-text {
+	font-weight: 500;
+	color: var(--text-dark);
+	margin-bottom: 0.5rem;
+	font-size: 1.1rem;
+}
+
+.upload-hint {
+	font-size: 0.9rem;
+	color: var(--text-muted);
+}
+
+/* Divider */
+.loose-divider {
+	margin: 3rem 0;
+}
+
+/* Actions */
+.cancel-btn {
+	background: none;
+	border: 1px solid #d1d5db;
+	padding: 0.85rem 2rem;
+	border-radius: var(--radius-md);
+	font-weight: 600;
+	color: var(--text-dark);
+	cursor: pointer;
+	margin-right: 1.5rem;
+	transition: background 0.2s;
+	font-size: 1rem;
+}
+
+.cancel-btn:hover {
+	background-color: #f3f4f6;
+}
+
+.submit-application-btn {
+	background-color: var(--primary-red);
+	padding-left: 2.5rem;
+	padding-right: 2.5rem;
+	padding-top: 0.85rem;
+	padding-bottom: 0.85rem;
+	font-size: 1rem;
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); 
+	backdrop-filter: blur(4px); 
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+	animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+	background-color: white;
+	padding: 2.5rem;
+	border-radius: 1.5rem;
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	width: 90%;
+	max-width: 450px;
+	text-align: center;
+	animation: scaleIn 0.2s ease-out;
+}
+
+.modal-icon {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 1rem;
+	color: var(--primary-red);
+}
+
+.modal-title {
+	margin: 0 0 0.75rem 0;
+	color: #111827;
+	font-size: 1.75rem;
+	font-weight: 800;
+}
+
+.modal-message {
+	color: #4b5563;
+	margin-bottom: 2rem;
+	font-size: 1.1rem;
+	line-height: 1.5;
+}
+
+.modal-button {
+	background-color: var(--primary-red);
+	color: white;
+	border: none;
+	padding: 1rem 2rem;
+	border-radius: 9999px;
+	font-size: 1.1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	width: 100%;
+}
+
+.modal-button:hover {
+	background-color: var(--secondary-red);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+	from { transform: scale(0.95); opacity: 0; }
+	to { transform: scale(1); opacity: 1; }
+}

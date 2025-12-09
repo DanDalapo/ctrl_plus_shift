@@ -1,95 +1,79 @@
-/* Inherits basic layout from profile_settings.css */
-
-/* Specific override for the card on this page to reduce top space */
-.settings-content-card.account-card-layout {
-  padding-top: 1rem; /* Reduced from default 2rem to move title higher */
-}
-
-/* --- Typography for Account Section --- */
-/* This ensures "Account Details" matches the "Profile Information" style */
-.account-section h2 {
-  margin-top: 0; /* Ensure no default margin pushes it down */
+.section-header h2 {
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 0.25rem;
-}
-
-/* --- Navigation Links Style --- */
-.tab-link {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  text-decoration: none; 
-  background-color: transparent;
-  border: none;
-  border-radius: 999px;
-  font-size: 1rem;
-  color: #555;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.tab-link:hover {
-  background-color: rgba(0,0,0,0.05);
-}
-
-.tab-link.active {
-  background-color: #fff;
-  color: #000;
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  color: var(--text-dark);
+  margin: 0 0 0.25rem 0;
 }
 
-/* --- Account Grid Layout --- */
-.account-grid {
+.section-description {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* Account Details Grid */
+.account-details-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; 
-  gap: 2rem 4rem; 
-  
-  /* Increased to match the large gap in your screenshot */
-  margin-top: 2.5rem; 
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  background-color: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #e5e7eb;
 }
 
-.account-item {
+.detail-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.account-item label {
-  font-size: 1.1rem;
+.detail-item label {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #000;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.account-value {
-  font-size: 1rem;
-  color: #444;
-}
-
-/* --- Status Indicator --- */
-.status-active {
+.detail-value {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+}
+
+/* Full Width for last item */
+.full-width {
+  grid-column: 1 / -1;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Active Status Dot */
+.status-active {
+  color: #166534; /* Dark green text */
+  background-color: #dcfce7; /* Light green bg */
+  padding: 4px 12px;
+  border-radius: 999px;
+  width: fit-content;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .status-dot {
-  width: 12px;
-  height: 12px;
-  background-color: #4ade80; /* Bright green */
-  border-radius: 50%;
   display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e; /* Bright Green */
+  border-radius: 50%;
+  margin-right: 8px;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
-  .account-grid {
+  .account-details-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
