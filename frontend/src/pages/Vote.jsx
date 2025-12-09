@@ -1,54 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './css/vote.css';
-import './css/home.css'; // Shared dashboard styles
+import './css/home.css';
+import './css/candidates.css';
 
 export default function VotePage() {
-    // Mock Data for Election Positions and Candidates
+    const [loading, setLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [selections, setSelections] = useState({});
+
+    // API Config (Used only for User Data now)
+    const API_URL = "http://localhost:8080"; 
+    const userId = 1; 
+
+    // --- HARDCODED ELECTION DATA (Matches Candidates.jsx) ---
     const electionData = [
         {
             id: 'pos_president',
-            title: 'Student Government President',
+            title: 'President', // Matches "position" in Candidates.jsx
             candidates: [
-                { id: 1, name: 'Manuel Quezon', detail: '4th year | Political Science', initials: 'MQ' },
-                { id: 2, name: 'Brent Micheal Tolentino', detail: '3rd year | Computer Science', initials: 'BT' },
-                { id: 3, name: 'Leni Robredo', detail: '2nd year | Political Science', initials: 'LR' }
-            ]
-        },
-        {
-            id: 'pos_dept_rep',
-            title: 'Department Representative',
-            candidates: [
-                { id: 4, name: 'Mark Jennings', detail: '3rd year | Business Administration', initials: 'MJ' },
-                { id: 5, name: 'Sarah Walker', detail: '2nd year | Marketing', initials: 'SW' }
+                { 
+                    id: 1, 
+                    name: 'Alexa Rhyz R. Paires', 
+                    detail: 'Visionary | 4th Year', 
+                    initials: 'AP' 
+                },
+                { 
+                    id: 2, 
+                    name: 'Jayz R. Olimba', 
+                    detail: 'Empowerment | 3rd Year', 
+                    initials: 'JO' 
+                },
+                { 
+                    id: 3, 
+                    name: 'Dan Erik Dalapo', 
+                    detail: 'Progressive | 4th Year', 
+                    initials: 'DD' 
+                }
             ]
         }
     ];
 
-    // State to track selected candidate ID for each position
-    // Format: { pos_president: 1, pos_dept_rep: null }
-    const [selections, setSelections] = useState({});
+    useEffect(() => {
+        // Fetch User Data for Sidebar
+        fetch(`${API_URL}/users/${userId}`)
+            .then(res => res.json())
+            .then(data => setCurrentUser(data))
+            .catch(err => console.error("Failed to load user", err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const getInitials = (first, last) => {
+        if (!first || !last) return "??";
+        return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+    };
 
     const handleVote = (positionId, candidateId) => {
-        setSelections(prev => ({
-            ...prev,
-            [positionId]: candidateId
-        }));
+        setSelections(prev => ({ ...prev, [positionId]: candidateId }));
     };
 
     const handleSubmit = (positionId, positionTitle) => {
         const selectedCandidateId = selections[positionId];
-        if (!selectedCandidateId) {
-            alert(`Please select a candidate for ${positionTitle} first.`);
-            return;
+        if (!selectedCandidateId) return;
+
+        // Find the candidate name for the alert
+        const position = electionData.find(p => p.id === positionId);
+        const candidate = position.candidates.find(c => c.id === selectedCandidateId);
+
+        if (window.confirm(`Confirm vote for ${candidate.name} as ${positionTitle}?`)) {
+            // Simulate API Call
+            console.log(`Submitting vote: Voter ${userId} -> Candidate ${selectedCandidateId}`);
+            alert(`Vote for ${candidate.name} submitted successfully!`);
         }
-        console.log(`Submitting vote for ${positionTitle}: Candidate ID ${selectedCandidateId}`);
-        // Add submission logic here (e.g., API call)
     };
+
+    if (loading) return <div className="dashboard-container" style={{padding: '50px'}}>Loading...</div>;
 
     return (
         <div className="dashboard-container">
-            
             {/* SIDEBAR */}
             <aside className="sidebar">
                 <div className="sidebar-brand">
@@ -60,11 +89,11 @@ export default function VotePage() {
 
                 <div className="user-profile-compact">
                     <div className="avatar-circle">
-                        <span className="initials">JD</span>
+                        <span className="initials">{currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : 'JD'}</span>
                     </div>
                     <div className="user-info-compact">
-                        <h4 className="user-name">John Doe</h4>
-                        <span className="user-role">Student Voter</span>
+                        <h4 className="user-name">{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Guest User'}</h4>
+                        <span className="user-role">Voter</span>
                     </div>
                 </div>
 
@@ -85,9 +114,8 @@ export default function VotePage() {
                         <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                         Results
                     </Link>
-                    {/* FIXED SETTINGS ICON */}
                     <Link to="/settings" className="nav-item">
-                        <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         Settings
                     </Link>
                 </nav>
@@ -103,21 +131,20 @@ export default function VotePage() {
             {/* MAIN CONTENT */}
             <main className="main-content">
                 <div className="content-scrollable">
-                    
-                    <div className="settings-header-block">
-                        <h1>Cast Your Vote</h1>
-                        <p>Select your preferred candidate for each position below.</p>
+                    <div className="candidates-header-row">
+                        <div className="header-text-block">
+                            <h1>Cast Your Vote</h1>
+                            <p>Select your preferred candidate for each position below.</p>
+                        </div>
                     </div>
 
                     <div className="voting-container">
                         {electionData.map((position) => (
                             <div key={position.id} className="vote-card">
                                 <h2 className="position-title">{position.title}</h2>
-                                
                                 <div className="candidates-group">
                                     {position.candidates.map((candidate) => {
                                         const isSelected = selections[position.id] === candidate.id;
-                                        
                                         return (
                                             <div 
                                                 key={candidate.id} 
@@ -133,24 +160,19 @@ export default function VotePage() {
                                                         <span className="vote-candidate-detail">{candidate.detail}</span>
                                                     </div>
                                                 </div>
-                                                <button 
-                                                    className={`vote-btn ${isSelected ? 'voted' : ''}`}
-                                                >
+                                                <button className={`vote-btn ${isSelected ? 'voted' : ''}`}>
                                                     {isSelected ? 'SELECTED' : 'VOTE'}
                                                 </button>
                                             </div>
                                         );
                                     })}
                                 </div>
-
                                 <div className="vote-footer">
-                                    <div className="warning-box">
-                                        <span className="warning-icon">⚠️</span>
-                                        <p><strong>Important:</strong> Once you submit your vote, it cannot be changed. Please review your selection carefully.</p>
-                                    </div>
                                     <button 
                                         className="submit-position-btn"
                                         onClick={() => handleSubmit(position.id, position.title)}
+                                        disabled={!selections[position.id]}
+                                        style={{ opacity: selections[position.id] ? 1 : 0.6 }}
                                     >
                                         Submit Vote for {position.title}
                                     </button>
@@ -158,7 +180,6 @@ export default function VotePage() {
                             </div>
                         ))}
                     </div>
-
                 </div>
             </main>
         </div>
