@@ -1,0 +1,153 @@
+.results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding-bottom: 4rem;
+}
+
+.results-card {
+    padding: 2.5rem;
+}
+
+.results-position-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 2rem 0;
+}
+
+.chart-area {
+    position: relative;
+    height: 250px;
+    margin-bottom: 3rem;
+    padding: 1rem 2rem 2rem 2rem;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-md);
+}
+
+.chart-grid-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 2rem; 
+    background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 100% 50px; 
+    z-index: 0;
+    opacity: 0.5;
+}
+
+.bars-container {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 100%;
+    z-index: 1;
+}
+
+.bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60px; 
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-fill {
+    width: 100%;
+    background-color: #fbbf24; 
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    transition: height 1s ease-out;
+    min-height: 2px;
+}
+
+.bar-label {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.result-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.result-name {
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+.result-percentage {
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.winner-row .result-name {
+    font-weight: 700;
+    color: #b45309; 
+}
+
+.winner-row .result-percentage {
+    color: #b45309;
+}
+
+.trophy-icon {
+    font-size: 1.1rem;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #e5e7eb;
+    border-radius: 999px;
+    transition: width 1s ease-out;
+}
+
+.winner-row .progress-fill {
+    background-color: var(--primary-red);
+}
+
+@media (max-width: 768px) {
+    .chart-area {
+        display: none;
+    }
+    
+    .bars-container {
+        overflow-x: auto;
+        justify-content: flex-start;
+        gap: 1rem;
+    }
+}
