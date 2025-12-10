@@ -16,6 +16,15 @@ public class CandidateService {
     }
 
     public CandidateEntity create(CandidateEntity c) {
+        // Check if user has already applied for candidacy with complete data
+        if (c.getUser() != null) {
+            repo.findByUser(c.getUser()).ifPresent(existing -> {
+                // Only block if the existing application has required data (positionName and platformTitle)
+                if (existing.getPositionName() != null && existing.getPlatformTitle() != null) {
+                    throw new RuntimeException("You have already applied for candidacy. Each user can only apply once.");
+                }
+            });
+        }
         return repo.save(c);
     }
 
@@ -30,9 +39,12 @@ public class CandidateService {
     public CandidateEntity update(Integer id, CandidateEntity c) {
         CandidateEntity candidateUpdate = repo.findById(id).orElse(null);
         if (candidateUpdate == null) return null;
-        candidateUpdate.setPlatform(c.getPlatform());
-        candidateUpdate.setPosition(c.getPosition());
+        candidateUpdate.setPositionName(c.getPositionName());
         candidateUpdate.setCourse(c.getCourse());
+        candidateUpdate.setPartyName(c.getPartyName());
+        candidateUpdate.setPlatformTitle(c.getPlatformTitle());
+        candidateUpdate.setPlatformDescription(c.getPlatformDescription());
+        candidateUpdate.setStatus(c.getStatus());
         candidateUpdate.setUser(c.getUser());
 
         return repo.save(candidateUpdate);

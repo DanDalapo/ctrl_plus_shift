@@ -4,52 +4,47 @@ import './css/candidates.css';
 import './css/home.css'; // Shared dashboard styles
 
 export default function CandidatesPage() {
-    // API Base URL
-    const API_URL = "http://localhost:8080"; 
-    
-    // MOCK LOGIN: Replace with actual logic when available
-    const userId = 1; 
-
     // State for User Data
     const [currentUser, setCurrentUser] = useState(null);
 
-    // State for Candidates (Keeping mock data for images/desc which aren't in DB yet)
-    const [candidates] = useState([
-        {
-            id: 1,
-            name: "Alexa Rhyz R. Paires",
-            image: "/alexa.jpg",
-            description: "A dedicated leader committed to transparency and student welfare. With a vision for inclusive growth, I aim to empower every Technologian to achieve their full potential. Together, let's innovate and elevate our campus community through service and integrity.",
-            position: "President",
-            platform: "Visionary", 
-            votes: 1091
-        },
-        {
-            id: 2,
-            name: "Jayz R. Olimba",
-            image: "/jayz.png", 
-            description: "An advocate for student empowerment and academic excellence. I strive to build a campus environment where every voice is heard and every student thrives. Let's work together to create meaningful change and a brighter future for our university.",
-            position: "President",
-            platform: "Empowerment",
-            votes: 9999
-        },
-        {
-            id: 3,
-            name: "Dan Erik Dalapo",
-            image: "/dan.png", 
-            description: "Driven by a passion for service and innovation, I aim to bridge the gap between students and administration. My goal is to foster a collaborative community where ideas turn into action. Together, we can build a more connected and progressive campus.",
-            position: "President",
-            platform: "Progressive",
-            votes: 2500
-        }
-    ]);
+    // State for Candidates - will be loaded from database
+    const [candidates, setCandidates] = useState([]);
 
     useEffect(() => {
-        // Fetch User Data for Sidebar
-        fetch(`${API_URL}/users/${userId}`)
+        // Get user from localStorage or sessionStorage
+        const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+        if (userData.userID) {
+            setCurrentUser(userData);
+        }
+
+        // Fetch candidates from database and merge with demo data
+        fetch('http://localhost:8080/candidates')
             .then(res => res.json())
-            .then(data => setCurrentUser(data))
-            .catch(err => console.error("Failed to load user", err));
+            .then(data => {
+                // Filter to only include candidates who have applied with complete data
+                const actualCandidates = data.filter(c => 
+                    c.candidateID && 
+                    c.user && 
+                    c.positionName && 
+                    c.platformTitle
+                );
+                
+                // Transform database candidates to match display format
+                const dbCandidates = actualCandidates.map(c => ({
+                    id: c.candidateID,
+                    name: `${c.user?.firstname || c.user?.firstName || ''} ${c.user?.lastName || ''}`.trim(),
+                    image: "/default-avatar.png", // Default image for DB candidates
+                    description: c.platformDescription || 'No description provided',
+                    position: c.positionName || 'N/A',
+                    platform: c.platformTitle || 'N/A',
+                    votes: 0, // Default votes for new candidates
+                    isDemo: false
+                }));
+                
+                // Replace demo data with database data (don't merge to avoid duplicates)
+                setCandidates(dbCandidates);
+            })
+            .catch(err => console.error("Failed to load candidates from database", err));
     }, []);
 
     // Helper to generate initials
@@ -74,15 +69,15 @@ export default function CandidatesPage() {
                 <div className="user-profile-compact">
                     <div className="avatar-circle">
                         <span className="initials">
-                            {currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}
+                            {currentUser ? getInitials(currentUser.firstname, currentUser.lastName) : '...'}
                         </span>
                     </div>
                     <div className="user-info-compact">
                         <h4 className="user-name">
-                            {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}
+                            {currentUser ? `${currentUser.firstname || ''} ${currentUser.lastName || ''}`.trim() : 'Loading...'}
                         </h4>
                         <span className="user-role">
-                            {currentUser ? (currentUser.userType || 'Student Voter') : ''}
+                            {currentUser ? (currentUser.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter') : ''}
                         </span>
                     </div>
                 </div>
@@ -111,7 +106,7 @@ export default function CandidatesPage() {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <Link to="/login" className="nav-item sign-out">
+                    <Link to="/" className="nav-item sign-out">
                         <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         Sign Out
                     </Link>
@@ -122,13 +117,24 @@ export default function CandidatesPage() {
             <main className="main-content">
                 <div className="content-scrollable">
                     
-                    {/* Header with Title (Button Removed) */}
+                    {/* Header with Title */}
                     <div className="candidates-header-row">
                         <div className="header-text-block">
                             <h1>Meet the Candidates</h1>
                             <p>Learn more about the candidates running for student council positions. Get to know their backgrounds, platforms, and vision.</p>
                         </div>
-                        {/* Apply button removed here */}
+                        {/* Show Apply button only for candidates */}
+                        {currentUser && currentUser.userType === 'CANDIDATE' && (
+                            <Link to="/apply-candidacy" className="apply-candidacy-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                                Apply Candidacy
+                            </Link>
+                        )}
                     </div>
 
                     {/* Candidates List */}

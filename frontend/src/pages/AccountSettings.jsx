@@ -7,15 +7,12 @@ export default function AccountSettings() {
     // State
     const [currentUser, setCurrentUser] = useState(null);
 
-    // API Config
-    const API_URL = "http://localhost:8080";
-    const userId = 1;
-
+    // Get user from localStorage or sessionStorage
     useEffect(() => {
-        fetch(`${API_URL}/users/${userId}`)
-            .then(res => res.json())
-            .then(data => setCurrentUser(data))
-            .catch(err => console.error("Failed to load user", err));
+        const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+        if (userData.userID) {
+            setCurrentUser(userData);
+        }
     }, []);
 
     const getInitials = (first, last) => {
@@ -38,15 +35,15 @@ export default function AccountSettings() {
           <div className="user-profile-compact">
             <div className="avatar-circle">
               <span className="initials">
-                  {currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}
+                  {currentUser ? getInitials(currentUser.firstname, currentUser.lastName) : '...'}
               </span>
             </div>
             <div className="user-info-compact">
               <h4 className="user-name">
-                  {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}
+                  {currentUser ? `${currentUser.firstname || ''} ${currentUser.lastName || ''}`.trim() : 'Loading...'}
               </h4>
               <span className="user-role">
-                  {currentUser ? (currentUser.userType || 'Student Voter') : ''}
+                  {currentUser ? (currentUser.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter') : ''}
               </span>
             </div>
           </div>
@@ -75,7 +72,7 @@ export default function AccountSettings() {
           </nav>
 
           <div className="sidebar-footer">
-            <Link to="/login" className="nav-item sign-out">
+            <Link to="/" className="nav-item sign-out">
               <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
               Sign Out
             </Link>

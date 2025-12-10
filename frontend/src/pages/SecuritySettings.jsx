@@ -5,9 +5,6 @@ import './css/security_settings.css';
 import './css/home.css';
 
 export default function SecuritySettings() {
-    const API_URL = "http://localhost:8080";
-    const userId = 1;
-
     const [currentUser, setCurrentUser] = useState(null);
     const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
     const [visibility, setVisibility] = useState({ current: false, new: false, confirm: false });
@@ -15,10 +12,10 @@ export default function SecuritySettings() {
     const [message, setMessage] = useState({ type: '', text: '' });
 
     useEffect(() => {
-        fetch(`${API_URL}/users/${userId}`)
-            .then(res => res.json())
-            .then(data => setCurrentUser(data))
-            .catch(err => console.error(err));
+        const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+        if (userData.userID) {
+            setCurrentUser(userData);
+        }
     }, []);
 
     const toggleVisibility = (field) => {
@@ -31,6 +28,11 @@ export default function SecuritySettings() {
     };
 
     const handlePasswordChange = async () => {
+        if (!currentUser || !currentUser.userID) {
+            setMessage({ type: 'error', text: 'User not found. Please log in again.' });
+            return;
+        }
+
         if (!passwords.current || !passwords.new || !passwords.confirm) {
             setMessage({ type: 'error', text: 'Please fill in all fields.' });
             return;
@@ -39,14 +41,47 @@ export default function SecuritySettings() {
             setMessage({ type: 'error', text: 'New passwords do not match.' });
             return;
         }
+        if (passwords.new.length < 6) {
+            setMessage({ type: 'error', text: 'New password must be at least 6 characters.' });
+            return;
+        }
+        if (passwords.current !== currentUser.password) {
+            setMessage({ type: 'error', text: 'Current password is incorrect.' });
+            return;
+        }
         
         setIsLoading(true);
-        // Simulate API delay
-        setTimeout(() => {
+        try {
+            const API_URL = "http://localhost:8080";
+            const response = await fetch(`${API_URL}/users/${currentUser.userID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...currentUser,
+                    password: passwords.new
+                })
+            });
+
+            if (response.ok) {
+                const updated = await response.json();
+                setCurrentUser(updated);
+                // Update localStorage/sessionStorage
+                if (localStorage.getItem('user')) {
+                    localStorage.setItem('user', JSON.stringify(updated));
+                }
+                if (sessionStorage.getItem('user')) {
+                    sessionStorage.setItem('user', JSON.stringify(updated));
+                }
+                setMessage({ type: 'success', text: 'Password updated successfully.' });
+                setPasswords({ current: '', new: '', confirm: '' });
+            } else {
+                throw new Error('Update failed');
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Failed to update password.' });
+        } finally {
             setIsLoading(false);
-            setMessage({ type: 'success', text: 'Password updated successfully.' });
-            setPasswords({ current: '', new: '', confirm: '' });
-        }, 1000);
+        }
     };
 
     const getInitials = (first, last) => {
@@ -85,15 +120,15 @@ export default function SecuritySettings() {
                 <div className="user-profile-compact">
                     <div className="avatar-circle">
                         <span className="initials">
-                            {currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}
+                            {currentUser ? getInitials(currentUser.firstname, currentUser.lastName) : '...'}
                         </span>
                     </div>
                     <div className="user-info-compact">
                         <h4 className="user-name">
-                            {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}
+                            {currentUser ? `${currentUser.firstname || ''} ${currentUser.lastName || ''}`.trim() : 'Loading...'}
                         </h4>
                         <span className="user-role">
-                            {currentUser ? (currentUser.userType || 'Student Voter') : ''}
+                            {currentUser ? (currentUser.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter') : ''}
                         </span>
                     </div>
                 </div>
@@ -122,7 +157,7 @@ export default function SecuritySettings() {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <Link to="/login" className="nav-item sign-out">
+                    <Link to="/" className="nav-item sign-out">
                         <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         Sign Out
                     </Link>
