@@ -9,16 +9,41 @@ export default function HomePage() {
     // State for Timer
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-    // API Configuration
-    const API_URL = "http://localhost:8080";
-    const userId = 1; // Mock User ID
+    // State for candidates and positions count
+    const [candidatesCount, setCandidatesCount] = useState(0);
+    const [positionsCount, setPositionsCount] = useState(0);
 
-    // Fetch User Data
+    // Get user from localStorage or sessionStorage
     useEffect(() => {
-        fetch(`${API_URL}/users/${userId}`)
+        const userString = localStorage.getItem('user') || sessionStorage.getItem('user');
+        if (userString) {
+            try {
+                const userData = JSON.parse(userString);
+                console.log('User data loaded:', userData); // Debug log
+                if (userData.userID) {
+                    setCurrentUser(userData);
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    }, []);
+
+    // Fetch candidates and positions count
+    useEffect(() => {
+        const API_URL = "http://localhost:8080";
+        
+        // Fetch candidates
+        fetch(`${API_URL}/candidates`)
             .then(res => res.json())
-            .then(data => setCurrentUser(data))
-            .catch(err => console.error("Failed to load user", err));
+            .then(data => setCandidatesCount(data.length))
+            .catch(err => console.error("Failed to load candidates", err));
+        
+        // Fetch positions
+        fetch(`${API_URL}/positions`)
+            .then(res => res.json())
+            .then(data => setPositionsCount(data.length))
+            .catch(err => console.error("Failed to load positions", err));
     }, []);
 
     // Timer Logic
@@ -83,15 +108,15 @@ export default function HomePage() {
           <div className="user-profile-compact">
             <div className="avatar-circle">
               <span className="initials">
-                  {currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}
+                  {currentUser ? getInitials(currentUser.firstname || currentUser.firstName, currentUser.lastName) : '...'}
               </span>
             </div>
             <div className="user-info-compact">
               <h4 className="user-name">
-                  {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}
+                  {currentUser ? `${currentUser.firstname || currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() : 'Loading...'}
               </h4>
               <span className="user-role">
-                  {currentUser ? (currentUser.userType || 'Student Voter') : ''}
+                  {currentUser ? (currentUser.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter') : ''}
               </span>
             </div>
           </div>
@@ -120,7 +145,7 @@ export default function HomePage() {
           </nav>
 
           <div className="sidebar-footer">
-            <Link to="/login" className="nav-item sign-out">
+            <Link to="/" className="nav-item sign-out">
               <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
               Sign Out
             </Link>
@@ -131,17 +156,17 @@ export default function HomePage() {
           <div className="content-scrollable">
             <section className="welcome-banner">
               <div className="banner-text">
-                <h1>Welcome back, {currentUser ? currentUser.firstName : 'Technologian'}</h1>
+                <h1>Welcome back, {currentUser ? (currentUser.firstname || currentUser.firstName || 'Technologian') : 'Technologian'}</h1>
                 <p>The 2025 Student Council Elections are fast approaching. Make sure you're informed and ready to vote.</p>
               </div>
               <div className="feature-stats">
                 <div className="stat-item">
-                  <span className="stat-val">12</span>
+                  <span className="stat-val">{candidatesCount}</span>
                   <span className="stat-label">Candidates</span>
                 </div>
                 <div className="stat-divider"></div>
                 <div className="stat-item">
-                  <span className="stat-val">3</span>
+                  <span className="stat-val">{positionsCount}</span>
                   <span className="stat-label">Positions</span>
                 </div>
               </div>

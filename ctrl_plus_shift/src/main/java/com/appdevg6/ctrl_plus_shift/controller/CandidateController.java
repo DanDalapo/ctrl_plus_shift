@@ -30,4 +30,14 @@ public class CandidateController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PostMapping
+    public ResponseEntity<?> createCandidate(@RequestBody CandidateEntity candidate) {
+        try {
+            CandidateEntity created = candidateService.create(candidate);
+            return ResponseEntity.ok(created);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

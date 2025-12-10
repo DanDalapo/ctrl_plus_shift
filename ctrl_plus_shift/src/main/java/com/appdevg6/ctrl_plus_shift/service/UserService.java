@@ -4,10 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.appdevg6.ctrl_plus_shift.entity.UserEntity;
 import com.appdevg6.ctrl_plus_shift.entity.VoterEntity;
-import com.appdevg6.ctrl_plus_shift.entity.CandidateEntity;
 import com.appdevg6.ctrl_plus_shift.repository.UserRepository;
 import com.appdevg6.ctrl_plus_shift.repository.VoterRepository;
-import com.appdevg6.ctrl_plus_shift.repository.CandidateRepository;
 
 import java.util.List;
 
@@ -16,14 +14,11 @@ public class UserService {
 
     private final UserRepository userRepo;
     private final VoterRepository voterRepo;
-    private final CandidateRepository candidateRepo;
 
     public UserService(UserRepository userRepo, 
-                       VoterRepository voterRepo, 
-                       CandidateRepository candidateRepo) {
+                       VoterRepository voterRepo) {
         this.userRepo = userRepo;
         this.voterRepo = voterRepo;
-        this.candidateRepo = candidateRepo;
     }
 
     public UserEntity create(UserEntity user) {
@@ -44,17 +39,9 @@ public class UserService {
         String type = savedUser.getUserType();
         if (type == null) type = "VOTER";
         
-        if (type.equalsIgnoreCase("CANDIDATE")) {
-            CandidateEntity candidate = new CandidateEntity();
-            candidate.setUser(savedUser);
-            candidate.setCourse("Not Set"); 
-            
-            candidate.setPlatform(null);
-            candidate.setPosition(null);
-            
-            candidateRepo.save(candidate);
-
-        } else {
+        // Only create voter record for VOTER type users
+        // CANDIDATE users will create their candidate record when they apply for candidacy
+        if (type.equalsIgnoreCase("VOTER")) {
             VoterEntity voter = new VoterEntity();
             voter.setUser(savedUser);
             
@@ -74,7 +61,7 @@ public class UserService {
         UserEntity userUpdate = userRepo.findById(id).orElse(null);
         if (userUpdate == null) return null;
 
-        if (updated.getFirstName() != null) userUpdate.setFirstName(updated.getFirstName());
+        if (updated.getFirstname() != null) userUpdate.setFirstname(updated.getFirstname());
         if (updated.getLastName() != null) userUpdate.setLastName(updated.getLastName());
         if (updated.getDateOfBirth() != null) userUpdate.setDateOfBirth(updated.getDateOfBirth());
         if (updated.getEmail() != null) userUpdate.setEmail(updated.getEmail());

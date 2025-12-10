@@ -5,49 +5,61 @@ import './css/home.css';
 import './css/candidates.css';
 
 export default function VotePage() {
-    const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const [selections, setSelections] = useState({});
-
-    // API Config (Used only for User Data now)
-    const API_URL = "http://localhost:8080"; 
-    const userId = 1; 
-
-    // --- HARDCODED ELECTION DATA (Matches Candidates.jsx) ---
-    const electionData = [
-        {
-            id: 'pos_president',
-            title: 'President', // Matches "position" in Candidates.jsx
-            candidates: [
-                { 
-                    id: 1, 
-                    name: 'Alexa Rhyz R. Paires', 
-                    detail: 'Visionary | 4th Year', 
-                    initials: 'AP' 
-                },
-                { 
-                    id: 2, 
-                    name: 'Jayz R. Olimba', 
-                    detail: 'Empowerment | 3rd Year', 
-                    initials: 'JO' 
-                },
-                { 
-                    id: 3, 
-                    name: 'Dan Erik Dalapo', 
-                    detail: 'Progressive | 4th Year', 
-                    initials: 'DD' 
-                }
-            ]
-        }
-    ];
+    const [electionData, setElectionData] = useState([]);
 
     useEffect(() => {
-        // Fetch User Data for Sidebar
-        fetch(`${API_URL}/users/${userId}`)
+        // Get user from localStorage or sessionStorage - synchronous
+        const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+        if (userData.userID) {
+            setCurrentUser(userData);
+        }
+
+        // Fetch candidates from database in background (non-blocking)
+        fetch('http://localhost:8080/candidates')
             .then(res => res.json())
-            .then(data => setCurrentUser(data))
-            .catch(err => console.error("Failed to load user", err))
-            .finally(() => setLoading(false));
+            .then(data => {
+                // Filter to only include candidates who have applied with complete data
+                const actualCandidates = data.filter(c => 
+                    c.candidateID && 
+                    c.user && 
+                    c.positionName && 
+                    c.platformTitle
+                );
+                
+                // Group candidates by position
+                const positionGroups = {};
+                actualCandidates.forEach(c => {
+                    const positionName = c.positionName || 'Other';
+                    if (!positionGroups[positionName]) {
+                        positionGroups[positionName] = [];
+                    }
+                    
+                    const firstName = c.user?.firstname || c.user?.firstName || '';
+                    const lastName = c.user?.lastName || '';
+                    positionGroups[positionName].push({
+                        id: c.candidateID,
+                        name: `${firstName} ${lastName}`.trim(),
+                        detail: `${c.platformTitle || 'N/A'} | ${c.course || 'N/A'}`,
+                        initials: `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase(),
+                        isDemo: false
+                    });
+                });
+
+                // Convert to election data format
+                const dbElectionData = Object.keys(positionGroups).map((posName, idx) => ({
+                    id: `pos_${posName.toLowerCase().replace(/\s+/g, '_')}`,
+                    title: posName,
+                    candidates: positionGroups[posName]
+                }));
+
+                // Set election data from database only
+                setElectionData(dbElectionData);
+            })
+            .catch(err => {
+                console.error("Failed to load candidates from database", err);
+            });
     }, []);
 
     const getInitials = (first, last) => {
@@ -69,15 +81,13 @@ export default function VotePage() {
 
         if (window.confirm(`Confirm vote for ${candidate.name} as ${positionTitle}?`)) {
             // Simulate API Call
-            console.log(`Submitting vote: Voter ${userId} -> Candidate ${selectedCandidateId}`);
+            console.log(`Submitting vote: Voter ${currentUser?.userID || 'Unknown'} -> Candidate ${selectedCandidateId}`);
             alert(`Vote for ${candidate.name} submitted successfully!`);
         }
     };
 
-    if (loading) return <div className="dashboard-container" style={{padding: '50px'}}>Loading...</div>;
-
     return (
-        <div className="dashboard-container">
+        <div className="dashboard-container">{/* SIDEBAR */}
             {/* SIDEBAR */}
             <aside className="sidebar">
                 <div className="sidebar-brand">
@@ -89,11 +99,11 @@ export default function VotePage() {
 
                 <div className="user-profile-compact">
                     <div className="avatar-circle">
-                        <span className="initials">{currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : 'JD'}</span>
+                        <span className="initials">{currentUser ? getInitials(currentUser.firstname, currentUser.lastName) : 'JD'}</span>
                     </div>
                     <div className="user-info-compact">
-                        <h4 className="user-name">{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Guest User'}</h4>
-                        <span className="user-role">Voter</span>
+                        <h4 className="user-name">{currentUser ? `${currentUser.firstname || ''} ${currentUser.lastName || ''}`.trim() : 'Guest User'}</h4>
+                        <span className="user-role">{currentUser ? (currentUser.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter') : ''}</span>
                     </div>
                 </div>
 
@@ -121,7 +131,7 @@ export default function VotePage() {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <Link to="/login" className="nav-item sign-out">
+                    <Link to="/" className="nav-item sign-out">
                         <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         Sign Out
                     </Link>

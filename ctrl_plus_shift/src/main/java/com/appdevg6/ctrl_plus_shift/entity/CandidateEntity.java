@@ -15,14 +15,17 @@ public class CandidateEntity {
     private UserEntity user;
 
     private String course;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "platformID", referencedColumnName = "platform_id")
-    private PlatformEntity platform;
-
-    @ManyToOne
-    @JoinColumn(name = "positionID", referencedColumnName = "position_id")
-    private PositionEntity position;
+    
+    private String partyName;
+    
+    private String platformTitle;
+    
+    @Column(length = 1000)
+    private String platformDescription;
+    
+    private String positionName;
+    
+    private String status = "PENDING"; // PENDING, APPROVED, REJECTED
 
     public Integer getCandidateID() {
         return candidateID;
@@ -48,19 +51,43 @@ public class CandidateEntity {
         this.course = course;
     }
 
-    public PlatformEntity getPlatform() {
-        return platform;
+    public String getPartyName() {
+        return partyName;
     }
 
-    public void setPlatform(PlatformEntity platform) {
-        this.platform = platform;
+    public void setPartyName(String partyName) {
+        this.partyName = partyName;
     }
 
-    public PositionEntity getPosition() {
-        return position;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPosition(PositionEntity position) {
-        this.position = position;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPlatformTitle() {
+        return platformTitle;
+    }
+
+    public void setPlatformTitle(String platformTitle) {
+        this.platformTitle = platformTitle;
+    }
+
+    public String getPlatformDescription() {
+        return platformDescription;
+    }
+
+    public void setPlatformDescription(String platformDescription) {
+        this.platformDescription = platformDescription;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
     }
 }

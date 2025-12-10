@@ -4,10 +4,6 @@ import './css/profile_settings.css';
 import './css/home.css';
 
 export default function ProfileSettings() {
-    // API Config
-    const API_URL = "http://localhost:8080";
-    const userId = 1; 
-
     // State
     const [currentUser, setCurrentUser] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -24,21 +20,19 @@ export default function ProfileSettings() {
     const [errorMessage, setErrorMessage] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
 
-    // Fetch User Data
+    // Fetch User Data from storage
     useEffect(() => {
-        fetch(`${API_URL}/users/${userId}`)
-            .then(res => res.json())
-            .then(data => {
-                setCurrentUser(data);
-                setFormData({
-                    fullName: `${data.firstname} ${data.lastName}`,
-                    email: data.email,
-                    idNumber: data.strStudentID || '',
-                    dob: data.dateOfBirth || '',
-                    bio: data.bio || ''
-                });
-            })
-            .catch(err => console.error("Failed to load user", err));
+        const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+        if (userData.userID) {
+            setCurrentUser(userData);
+            setFormData({
+                fullName: `${userData.firstname || ''} ${userData.lastName || ''}`.trim(),
+                email: userData.email || '',
+                idNumber: userData.strStudentID || '',
+                dob: userData.dateOfBirth || '',
+                bio: userData.bio || ''
+            });
+        }
     }, []);
 
     const getInitials = (first, last) => {
@@ -52,6 +46,12 @@ export default function ProfileSettings() {
     };
 
     const handleSaveChanges = async () => {
+        if (!currentUser || !currentUser.userID) {
+            setErrorMessage('User not found. Please log in again.');
+            setShowError(true);
+            return;
+        }
+
         if (formData.bio.length > 500) {
             setErrorMessage('Bio cannot exceed 500 characters.');
             setShowError(true);
@@ -60,19 +60,27 @@ export default function ProfileSettings() {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}/users/${userId}`, {
+            const API_URL = "http://localhost:8080";
+            const response = await fetch(`${API_URL}/users/${currentUser.userID}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...currentUser,
                     bio: formData.bio,
-                    // In a real app, you would parse fullName back to first/last names if editable
+                  
                 }),
             });
 
             if (response.ok) {
                 const updated = await response.json();
                 setCurrentUser(updated);
+                // Update localStorage/sessionStorage
+                if (localStorage.getItem('user')) {
+                    localStorage.setItem('user', JSON.stringify(updated));
+                }
+                if (sessionStorage.getItem('user')) {
+                    sessionStorage.setItem('user', JSON.stringify(updated));
+                }
                 setShowSuccess(true);
             } else {
                 throw new Error("Update failed");
@@ -83,9 +91,7 @@ export default function ProfileSettings() {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    return (
+    };    return (
         <div className="dashboard-container">
             {/* SIDEBAR */}
             <aside className="sidebar">
@@ -98,11 +104,11 @@ export default function ProfileSettings() {
 
                 <div className="user-profile-compact">
                     <div className="avatar-circle">
-                        <span className="initials">{currentUser ? getInitials(currentUser.firstName, currentUser.lastName) : '...'}</span>
+                        <span className="initials">{currentUser ? getInitials(currentUser.firstname, currentUser.lastName) : '...'}</span>
                     </div>
                     <div className="user-info-compact">
-                        <h4 className="user-name">{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Loading...'}</h4>
-                        <span className="user-role">{currentUser ? (currentUser.userType || 'Student Voter') : ''}</span>
+                        <h4 className="user-name">{currentUser ? `${currentUser.firstname || ''} ${currentUser.lastName || ''}`.trim() : 'Loading...'}</h4>
+                        <span className="user-role">{currentUser ? (currentUser.userType === 'CANDIDATE' ? 'Candidate' : 'Student Voter') : ''}</span>
                     </div>
                 </div>
 
@@ -125,7 +131,7 @@ export default function ProfileSettings() {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <Link to="/login" className="nav-item sign-out">
+                    <Link to="/" className="nav-item sign-out">
                         <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> Sign Out
                     </Link>
                 </div>
